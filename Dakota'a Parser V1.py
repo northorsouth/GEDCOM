@@ -1,5 +1,4 @@
 import sys
-import sqlite3
 
 tagRules =[
 	(0, 'INDI'),
@@ -70,10 +69,3 @@ if len(sys.argv) > 1:
 				valid + "|" +
 				args
 			)
-
-dbName = "GEDCOM.db"
-
-def dbInit():
-	conn = sqlite3.connect(dbName)
-
-dbInit()
