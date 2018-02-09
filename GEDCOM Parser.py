@@ -94,18 +94,7 @@ if len(sys.argv) > 1:
 				birth = args
 			elif (lastTag == 'DEAT' and tag == 'DATE'):
 				birth = args
-
-		#prints indiviual's info into table
-		if (valid and level == 0):
-
-			#Table for individuals
-			INDI_tbl = PrettyTable()
-			INDI_tbl.fieldnames = ["ID","Name","Sex","Birth","Death"]
-
-			INDI_tbl.add_row([indID, name, gender, birth, death])
-			print(INDI_tbl)
-
-		#prints familiy	info into table
+				
 			if (tag == 'HUSB'):
 				husband = args
 			elif (tag == 'WIFE'):
@@ -117,14 +106,24 @@ if len(sys.argv) > 1:
 			elif (lastTag == 'DIV' and tag == 'DATE'):
 				divorced = args
 
+		#prints indiviual's info into table
 		if (valid and level == 0):
+			
+			if (indID != ""):
+				#Table for individuals
+				INDI_tbl = PrettyTable()
+				INDI_tbl.fieldnames = ["ID","Name","Sex","Birth","Death"]
 
-			#Table for families
-			FAM_tbl = PrettyTable()
-			FAM_tbl.fieldnames = ["Family ID","Husband ID", "Wife ID"]
+				INDI_tbl.add_row([indID, name, gender, birth, death])
+				print(INDI_tbl)
+			
+			elif (famID != ""):
+				#Table for families
+				FAM_tbl = PrettyTable()
+				FAM_tbl.fieldnames = ["Family ID","Husband ID", "Wife ID"]
 
-			FAM_tbl.add_row([famID, husband, wife])
-			print(FAM_tbl)
+				FAM_tbl.add_row([famID, husband, wife])
+				print(FAM_tbl)
 
 def dbInit():
 
