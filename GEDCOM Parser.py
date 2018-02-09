@@ -77,7 +77,9 @@ def addChild (childID, famID):
 	
 	conn.commit()
 
-
+def getIndividuals():
+	
+	return conn.cursor().execute('SELECT * FROM INDIVIDUALS ORDER BY id').fetchall()
 
 conn = dbInit()
 
@@ -86,5 +88,7 @@ addIndividual("I2", "Hillary", "Clinton", "F", "10-26-1947", None)
 addIndividual("I3", "Miranda", "Cosgrove", "F", "5-14-1993", None)
 addFamily("F1", "6-15-1972", None, "I1", "I2")
 addChild("I3", "F1")
+
+print(getIndividuals())
 
 conn.close()
