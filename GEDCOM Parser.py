@@ -52,34 +52,69 @@ def dbInit():
 
 def addIndividual (idStr, firstName, lastName, gender, birth, death):
 	
-	conn.cursor().execute(
-		'INSERT INTO individuals VALUES (?, ?, ?, ?, ?, ?)',
-		(idStr, firstName, lastName, gender, birth, death)
-	)
+	result = True
+	
+	try:
+		conn.cursor().execute(
+			'INSERT INTO individuals VALUES (?, ?, ?, ?, ?, ?)',
+			(idStr, firstName, lastName, gender, birth, death)
+		)
+	
+	except sqlite3.IntegrityError as err:
+		print("Couldn't add individual " + idStr + ": " + str(err))
+		result = False 
 	
 	conn.commit()
+	
+	return result
+
+
 
 def addFamily (idStr, married, divorced, husbID, wifeID):
 	
-	conn.cursor().execute(
-		'INSERT INTO families VALUES (?, ?, ?, ?, ?)',
-		(idStr, married, divorced, husbID, wifeID)
-	)
+	result = True
+	
+	try:
+		conn.cursor().execute(
+			'INSERT INTO families VALUES (?, ?, ?, ?, ?)',
+			(idStr, married, divorced, husbID, wifeID)
+		)
+	
+	except sqlite3.IntegrityError as err:
+		print("Couldn't add family " + idStr + ": " + str(err))
+		result = False 
 	
 	conn.commit()
+	
+	return result
+
+
 
 def addChild (childID, famID):
 	
-	conn.cursor().execute(
-		'INSERT INTO children VALUES (?, ?)',
-		(childID, famID)
-	)
+	result = True
+	
+	try:
+		conn.cursor().execute(
+			'INSERT INTO children VALUES (?, ?)',
+			(childID, famID)
+		)
+	
+	except sqlite3.IntegrityError as err:
+		print("Couldn't add child " + childID + ": " + str(err))
+		result = False 
 	
 	conn.commit()
+	
+	return result
+
+
 
 def getIndividuals():
 	
 	return conn.cursor().execute('SELECT * FROM INDIVIDUALS ORDER BY id').fetchall()
+
+
 
 def getIndividual(indID):
 	
@@ -88,9 +123,13 @@ def getIndividual(indID):
 		(indID,)
 	).fetchone()
 
+
+
 def getFamilies():
 	
 	return conn.cursor().execute('SELECT * FROM FAMILIES ORDER BY id').fetchall()
+
+
 
 def getFamily(famID):
 	
@@ -98,6 +137,8 @@ def getFamily(famID):
 		'SELECT * FROM FAMILIES WHERE id=?',
 		(famID,)
 	).fetchall()
+
+
 
 conn = dbInit()
 
@@ -107,6 +148,6 @@ addIndividual("I3", "Miranda", "Cosgrove", "F", "5-14-1993", None)
 addFamily("F1", "6-15-1972", None, "I1", "I2")
 addChild("I3", "F1")
 
-print(getFamily("F1"))
+print(getIndividuals())
 
 conn.close()
