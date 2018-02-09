@@ -1,7 +1,7 @@
 import os
 import sqlite3
 import sys
-import PrettyTable
+from prettytable import PrettyTable
 
 dbName = "GEDCOM.db"
 
@@ -94,7 +94,7 @@ if len(sys.argv) > 1:
 				birth = args
 			elif (lastTag == 'DEAT' and tag == 'DATE'):
 				birth = args
-				
+
 			if (tag == 'HUSB'):
 				husband = args
 			elif (tag == 'WIFE'):
@@ -108,7 +108,7 @@ if len(sys.argv) > 1:
 
 		#prints indiviual's info into table
 		if (valid and level == 0):
-			
+
 			if (indID != ""):
 				#Table for individuals
 				INDI_tbl = PrettyTable()
@@ -116,7 +116,7 @@ if len(sys.argv) > 1:
 
 				INDI_tbl.add_row([indID, name, gender, birth, death])
 				print(INDI_tbl)
-			
+
 			elif (famID != ""):
 				#Table for families
 				FAM_tbl = PrettyTable()
