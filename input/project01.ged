@@ -1,4 +1,4 @@
-0 NOTE This file was created by Nestor Ouranitsas
+0 NOTE The github repository is: https://github.com/northorsouth/ssw555tm022018Spring
 0 I01 INDI
 1 NAME Richard /Johnson/
 1 SEX M
@@ -24,7 +24,7 @@
 2 DATE 29 AUG 1962
 1 FAMC F01
 0 NOTE end Robert Johnson
-0 I04 INDI 
+0 I04 INDI
 1 NAME Benjamin /Johnson
 1 SEX M
 1 BIRT
@@ -51,7 +51,7 @@
 0 NOTE end FAM F01
 0 I06 INDI
 1 NAME Hubert /Broome/
-1 SEX M 
+1 SEX M
 1 BIRT
 2 DATE 5 MAY 1940
 1 DEAT
@@ -120,7 +120,7 @@
 1 FAMC F04
 0 NOTE end Jason Plum
 0 F04 FAM
-1 MARR 
+1 MARR
 2 DATE 5 AUG 2003
 1 HUSB I11
 1 WIFE I05
