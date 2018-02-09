@@ -260,8 +260,15 @@ def addChild (childID, famID):
 
 
 def getIndividuals():
+<<<<<<< Updated upstream
 
 	return conn.cursor().execute('SELECT * FROM INDIVIDUALS ORDER BY id').fetchall()
+=======
+	
+	return conn.cursor().execute(
+		'SELECT * FROM INDIVIDUALS ORDER BY id'
+	).fetchall()
+>>>>>>> Stashed changes
 
 
 
@@ -275,8 +282,15 @@ def getIndividual(indID):
 
 
 def getFamilies():
+<<<<<<< Updated upstream
 
 	return conn.cursor().execute('SELECT * FROM FAMILIES ORDER BY id').fetchall()
+=======
+	
+	return conn.cursor().execute(
+		'SELECT * FROM FAMILIES ORDER BY id'
+	).fetchall()
+>>>>>>> Stashed changes
 
 
 
