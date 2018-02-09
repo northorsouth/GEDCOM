@@ -81,6 +81,24 @@ def getIndividuals():
 	
 	return conn.cursor().execute('SELECT * FROM INDIVIDUALS ORDER BY id').fetchall()
 
+def getIndividual(indID):
+	
+	return conn.cursor().execute(
+		'SELECT * FROM INDIVIDUALS WHERE id=?',
+		(indID,)
+	).fetchone()
+
+def getFamilies():
+	
+	return conn.cursor().execute('SELECT * FROM FAMILIES ORDER BY id').fetchall()
+
+def getFamily(famID):
+	
+	return conn.cursor().execute(
+		'SELECT * FROM FAMILIES WHERE id=?',
+		(famID,)
+	).fetchall()
+
 conn = dbInit()
 
 addIndividual("I1", "Bob", "Dyalan", "M", "5-24-1941", None)
@@ -89,6 +107,6 @@ addIndividual("I3", "Miranda", "Cosgrove", "F", "5-14-1993", None)
 addFamily("F1", "6-15-1972", None, "I1", "I2")
 addChild("I3", "F1")
 
-print(getIndividuals())
+print(getFamily("F1"))
 
 conn.close()

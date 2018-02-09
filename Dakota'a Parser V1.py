@@ -23,8 +23,21 @@ tagRules =[
 # if a file name was passed in
 if len(sys.argv) > 1:
 	
+	indID = ""
+	name = ""
+	gender = ""
+	birth = ""
+	death = "None"
+	
+	lastTag = None
+	
 	# loop through lines
 	for line in open(sys.argv[1]):
+		
+		valid = False
+		level = -1
+		tag = None
+		args = None
 		
 		# make sure this line has at least a level and a tag
 		words = line.split()
@@ -53,19 +66,29 @@ if len(sys.argv) > 1:
 					badOrder = True
 			
 			# guilty until proven innocent
-			valid = 'N'
+			valid = False
 			
 			# if we find a matching tag rule, and the level checks out
 			# tag is valid
 			if not badOrder:
 				for tagRule in tagRules:
 					if tagRule[1]==tag and tagRule[0]==level:
-						valid = 'Y'
+						valid = True
 			
-			print(
-				"--> " + line + "<-- " +
-				str(level) + "|" +
-				tag + "|" +
-				valid + "|" +
-				args
-			)
+			if (tag == 'NAME'):
+				name = args
+				
+			elif (tag == "SEX"):
+				gender = args[0]
+			
+			elif (lastTag=="BIRT" and tag == "DATE"):
+				birth = args
+			
+			elif (lastTag=="DEAT" and tag == "DATE"):
+				birth = args
+			
+			lastTag = tag
+		
+		if (valid and level==0):
+			
+			print("" + name + ", " + gender + ", " + birth + ", " + death)
