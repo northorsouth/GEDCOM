@@ -86,7 +86,9 @@ if len(sys.argv) > 1:
 					if tagRule[1]==tag and tagRule[0]==level:
 						valid = True
 
-			if (tag == 'NAME'):
+			if(tag == 'INDI'):
+				inID = args
+			elif (tag == 'NAME'):
 				name = args
 			elif (tag == 'SEX'):
 				gender = args[0]
@@ -95,7 +97,9 @@ if len(sys.argv) > 1:
 			elif (lastTag == 'DEAT' and tag == 'DATE'):
 				birth = args
 
-			if (tag == 'HUSB'):
+			if (tag == 'FAM'):
+				famID = args
+			elif (tag == 'HUSB'):
 				husband = args
 			elif (tag == 'WIFE'):
 				wife = args
