@@ -173,7 +173,6 @@ def dbInit():
 	return conn
 
 def addIndividual (idStr, firstName, lastName, gender, birth, death):
-<<<<<<< Updated upstream
 
 	result = True
 
@@ -187,14 +186,6 @@ def addIndividual (idStr, firstName, lastName, gender, birth, death):
 		print("Couldn't add individual " + idStr + ": " + str(err))
 		result = False
 
-=======
-
-	conn.cursor().execute(
-		'INSERT INTO individuals VALUES (?, ?, ?, ?, ?, ?)',
-		(idStr, firstName, lastName, gender, birth, death)
-	)
-
->>>>>>> Stashed changes
 	conn.commit()
 
 	return result
@@ -202,7 +193,6 @@ def addIndividual (idStr, firstName, lastName, gender, birth, death):
 
 
 def addFamily (idStr, married, divorced, husbID, wifeID):
-<<<<<<< Updated upstream
 
 	result = True
 
@@ -216,14 +206,6 @@ def addFamily (idStr, married, divorced, husbID, wifeID):
 		print("Couldn't add family " + idStr + ": " + str(err))
 		result = False
 
-=======
-
-	conn.cursor().execute(
-		'INSERT INTO families VALUES (?, ?, ?, ?, ?)',
-		(idStr, married, divorced, husbID, wifeID)
-	)
-
->>>>>>> Stashed changes
 	conn.commit()
 
 	return result
@@ -231,7 +213,6 @@ def addFamily (idStr, married, divorced, husbID, wifeID):
 
 
 def addChild (childID, famID):
-<<<<<<< Updated upstream
 
 	result = True
 
@@ -245,14 +226,6 @@ def addChild (childID, famID):
 		print("Couldn't add child " + childID + ": " + str(err))
 		result = False
 
-=======
-
-	conn.cursor().execute(
-		'INSERT INTO children VALUES (?, ?)',
-		(childID, famID)
-	)
-
->>>>>>> Stashed changes
 	conn.commit()
 
 	return result
@@ -260,15 +233,8 @@ def addChild (childID, famID):
 
 
 def getIndividuals():
-<<<<<<< Updated upstream
 
 	return conn.cursor().execute('SELECT * FROM INDIVIDUALS ORDER BY id').fetchall()
-=======
-	
-	return conn.cursor().execute(
-		'SELECT * FROM INDIVIDUALS ORDER BY id'
-	).fetchall()
->>>>>>> Stashed changes
 
 
 
@@ -282,15 +248,8 @@ def getIndividual(indID):
 
 
 def getFamilies():
-<<<<<<< Updated upstream
 
 	return conn.cursor().execute('SELECT * FROM FAMILIES ORDER BY id').fetchall()
-=======
-	
-	return conn.cursor().execute(
-		'SELECT * FROM FAMILIES ORDER BY id'
-	).fetchall()
->>>>>>> Stashed changes
 
 
 
