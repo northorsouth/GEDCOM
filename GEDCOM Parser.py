@@ -100,13 +100,13 @@ if len(sys.argv) > 1:
 
 			#Table for individuals
 			INDI_tbl = PrettyTable()
-			INDI_tbl.fieldnames = ["ID","Name"]
+			INDI_tbl.fieldnames = ["ID","Name","Sex","Birth","Death"]
 
-			INDI_tbl.add_row([name, gender, birth, death])
+			INDI_tbl.add_row([indID, name, gender, birth, death])
 			print(INDI_tbl)
 
 		#prints familiy	info into table
-		if (tag == 'HUSB'):
+			if (tag == 'HUSB'):
 				husband = args
 			elif (tag == 'WIFE'):
 				wife = args
@@ -121,7 +121,7 @@ if len(sys.argv) > 1:
 
 			#Table for families
 			FAM_tbl = PrettyTable()
-			FAM_tbl.fieldnames = ["Family ID","Husband Name","Husband ID","Wife Name","Wife ID"]
+			FAM_tbl.fieldnames = ["Family ID","Husband ID", "Wife ID"]
 
 			FAM_tbl.add_row([famID, husband, wife])
 			print(FAM_tbl)
@@ -174,19 +174,19 @@ def dbInit():
 
 def addIndividual (idStr, firstName, lastName, gender, birth, death):
 <<<<<<< Updated upstream
-	
+
 	result = True
-	
+
 	try:
 		conn.cursor().execute(
 			'INSERT INTO individuals VALUES (?, ?, ?, ?, ?, ?)',
 			(idStr, firstName, lastName, gender, birth, death)
 		)
-	
+
 	except sqlite3.IntegrityError as err:
 		print("Couldn't add individual " + idStr + ": " + str(err))
-		result = False 
-	
+		result = False
+
 =======
 
 	conn.cursor().execute(
@@ -196,26 +196,26 @@ def addIndividual (idStr, firstName, lastName, gender, birth, death):
 
 >>>>>>> Stashed changes
 	conn.commit()
-	
+
 	return result
 
 
 
 def addFamily (idStr, married, divorced, husbID, wifeID):
 <<<<<<< Updated upstream
-	
+
 	result = True
-	
+
 	try:
 		conn.cursor().execute(
 			'INSERT INTO families VALUES (?, ?, ?, ?, ?)',
 			(idStr, married, divorced, husbID, wifeID)
 		)
-	
+
 	except sqlite3.IntegrityError as err:
 		print("Couldn't add family " + idStr + ": " + str(err))
-		result = False 
-	
+		result = False
+
 =======
 
 	conn.cursor().execute(
@@ -225,26 +225,26 @@ def addFamily (idStr, married, divorced, husbID, wifeID):
 
 >>>>>>> Stashed changes
 	conn.commit()
-	
+
 	return result
 
 
 
 def addChild (childID, famID):
 <<<<<<< Updated upstream
-	
+
 	result = True
-	
+
 	try:
 		conn.cursor().execute(
 			'INSERT INTO children VALUES (?, ?)',
 			(childID, famID)
 		)
-	
+
 	except sqlite3.IntegrityError as err:
 		print("Couldn't add child " + childID + ": " + str(err))
-		result = False 
-	
+		result = False
+
 =======
 
 	conn.cursor().execute(
@@ -254,7 +254,7 @@ def addChild (childID, famID):
 
 >>>>>>> Stashed changes
 	conn.commit()
-	
+
 	return result
 
 
