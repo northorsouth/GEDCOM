@@ -53,7 +53,7 @@ def dbInit():
 		husbID 		TEXT	NOT NULL,
 		wifeID 		TEXT	NOT NULL,
 
-		FOREIGN KEY (husbID) REFERENCES individuals(id)
+		FOREIGN KEY (husbID) REFERENCES individuals(id),
 		FOREIGN KEY (wifeID) REFERENCES individuals(id)
 	)''')
 
@@ -166,7 +166,7 @@ INDI_tbl.field_names = ["ID","First Name","Last Name","Sex","Birth","Death"]
 
 #Table for families
 FAM_tbl = PrettyTable()
-FAM_tbl.field_names = ["Family ID","Husband ID", "Wife ID"]
+FAM_tbl.field_names = ["Family ID","Married","Divorced","Husband ID","Wife ID"]
 
 # if a file name was passed in
 if len(sys.argv) > 1:
@@ -273,19 +273,29 @@ if len(sys.argv) > 1:
 
 			elif (husband != None):
 				addFamily(famID, married, divorced, husband, wife)
-				
+
 				for child in children:
 					addChild(child, famID)
-				
+
 				famID = None
 				husband = None
 				wife = None
 				married = None
 				divorced = None
+				children = []
 
-#print(INDI_tbl)
-#print(FAM_tbl)
+#adding information from database into individual prettytable
+for i in getIndividuals():
+	INDI_tbl.add_row([x for x in i])
 
-print((getIndividuals()))
+#prints table of individuals
+print(INDI_tbl)
+
+#adding information from database into family prettytable
+for k in getFamilies():
+	FAM_tbl.add_row([x for x in k])
+
+#prints table of families
+print(FAM_tbl)
 
 conn.close()
