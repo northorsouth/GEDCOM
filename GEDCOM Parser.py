@@ -162,7 +162,7 @@ def getFamily(famID):
 
 #Table for individuals
 INDI_tbl = PrettyTable()
-INDI_tbl.field_names = ["ID","Name","Sex","Birth","Death"]
+INDI_tbl.field_names = ["ID","First Name","Last Name","Sex","Birth","Death"]
 
 #Table for families
 FAM_tbl = PrettyTable()
@@ -170,7 +170,7 @@ FAM_tbl.field_names = ["Family ID","Husband ID", "Wife ID"]
 
 # if a file name was passed in
 if len(sys.argv) > 1:
-	
+
 	conn = dbInit()
 
 	indID = None
@@ -263,9 +263,10 @@ if len(sys.argv) > 1:
 		if (valid and level == 0):
 
 			if (lastName != None):
-				INDI_tbl.add_row([indID, name, gender, birth, death])
+				INDI_tbl.add_row([indID, firstName, lastName, gender, birth, death])
 				indID = None
-				name = None
+				lastName = None
+				firstName = None
 				gender = None
 				birth = None
 				death = None
