@@ -24,124 +24,6 @@ tagRules =[
 	(0, 'TRLR'),
 	(0, 'NOTE')
 ]
-#Table for individuals
-INDI_tbl = PrettyTable()
-INDI_tbl.field_names = ["ID","Name","Sex","Birth","Death"]
-
-#Table for families
-FAM_tbl = PrettyTable()
-FAM_tbl.field_names = ["Family ID","Husband ID", "Wife ID"]
-
-# if a file name was passed in
-if len(sys.argv) > 1:
-
-
-	indID = None
-	name = None
-	gender = None
-	birth = None
-	death = None
-
-	famID = None
-	husband = None
-	wife = None
-	child = None
-	married = None
-	divorced = None
-
-	lastTag = None
-
-	# loop through lines
-	for line in open(sys.argv[1]):
-
-		valid = False
-		level = -1
-		tag = None
-		args = None
-
-		# make sure this line has at least a level and a tag
-		words = line.split()
-		if len(words) >= 2:
-
-			# level is always first
-			level = int(words[0])
-
-			# flag for INDI and FAM
-			badOrder = False
-
-			# order is switched for INDI and FAM
-			if (len(words) >= 3 and
-				(words[2] == 'INDI' or words[2] == 'FAM')):
-
-				tag = words[2]
-				args = " ".join([words[1]] + words[3:])
-			else:
-				tag = words[1]
-				args = " ".join(words[2:])
-
-				# INDI and FAM should have been found in block above
-				# if this trips, the order is wrong
-				if tag == 'INDI' or tag == 'FAM':
-					badOrder = True
-
-			# guilty until proven innocent
-			valid = False
-
-			# if we find a matching tag rule, and the level checks out
-			# tag is valid
-			if not badOrder:
-				for tagRule in tagRules:
-					if tagRule[1]==tag and tagRule[0]==level:
-						valid = True
-
-			if(tag == 'INDI'):
-				indID = args
-			elif (tag == 'NAME'):
-				name = args
-			elif (tag == 'SEX'):
-				gender = args[0]
-			elif (lastTag == 'BIRT' and tag == 'DATE'):
-				birth = args
-			elif (lastTag == 'DEAT' and tag == 'DATE'):
-				death = args
-
-			if (tag == 'FAM'):
-				famID = args
-			elif (tag == 'HUSB'):
-				husband = args
-			elif (tag == 'WIFE'):
-				wife = args
-			elif (tag == 'CHIL'):
-				child = args
-			elif (lastTag == 'MARR' and tag == 'DATE'):
-				married = args
-			elif (lastTag == 'DIV' and tag == 'DATE'):
-				divorced = args
-
-			lastTag = tag
-
-		#prints indiviual's info into table
-		if (valid and level == 0):
-
-			if (name != None):
-				INDI_tbl.add_row([indID, name, gender, birth, death])
-				indID = None
-				name = None
-				gender = None
-				birth = None
-				death = None
-
-			elif (husband != None):
-				FAM_tbl.add_row([famID, husband, wife])
-				famID = None
-				husband = None
-				wife = None
-				child = None
-				married = None
-				divorced = None
-
-print(INDI_tbl)
-print(FAM_tbl)
 
 def dbInit():
 
@@ -278,15 +160,128 @@ def getFamily(famID):
 	).fetchall()
 
 
+#Table for individuals
+INDI_tbl = PrettyTable()
+INDI_tbl.field_names = ["ID","Name","Sex","Birth","Death"]
 
-conn = dbInit()
+#Table for families
+FAM_tbl = PrettyTable()
+FAM_tbl.field_names = ["Family ID","Husband ID", "Wife ID"]
 
-addIndividual("I1", "Bob", "Dyalan", "M", "5-24-1941", None)
-addIndividual("I2", "Hillary", "Clinton", "F", "10-26-1947", None)
-addIndividual("I3", "Miranda", "Cosgrove", "F", "5-14-1993", None)
-addFamily("F1", "6-15-1972", None, "I1", "I2")
-addChild("I3", "F1")
+# if a file name was passed in
+if len(sys.argv) > 1:
+	
+	conn = dbInit()
 
-print(getIndividuals())
+	indID = None
+	firstName = None
+	lastName = None
+	gender = None
+	birth = None
+	death = None
+
+	famID = None
+	husband = None
+	wife = None
+	child = None
+	married = None
+	divorced = None
+
+	lastTag = None
+
+	# loop through lines
+	for line in open(sys.argv[1]):
+
+		valid = False
+		level = -1
+		tag = None
+		args = None
+
+		# make sure this line has at least a level and a tag
+		words = line.split()
+		if len(words) >= 2:
+
+			# level is always first
+			level = int(words[0])
+
+			# flag for INDI and FAM
+			badOrder = False
+
+			# order is switched for INDI and FAM
+			if (len(words) >= 3 and
+				(words[2] == 'INDI' or words[2] == 'FAM')):
+
+				tag = words[2]
+				args = [words[1]] + words[3:]
+			else:
+				tag = words[1]
+				args = words[2:]
+
+				# INDI and FAM should have been found in block above
+				# if this trips, the order is wrong
+				if tag == 'INDI' or tag == 'FAM':
+					badOrder = True
+
+			# guilty until proven innocent
+			valid = False
+
+			# if we find a matching tag rule, and the level checks out
+			# tag is valid
+			if not badOrder:
+				for tagRule in tagRules:
+					if tagRule[1]==tag and tagRule[0]==level:
+						valid = True
+
+			if(tag == 'INDI'):
+				indID = args[0]
+			elif (tag == 'NAME'):
+				lastName = args[-1][1:-1]
+				firstName = " ".join(args[0:-1])
+			elif (tag == 'SEX'):
+				gender = args[0]
+			elif (lastTag == 'BIRT' and tag == 'DATE'):
+				birth = " ".join(args)
+			elif (lastTag == 'DEAT' and tag == 'DATE'):
+				death = " ".join(args)
+
+			if (tag == 'FAM'):
+				famID = args[0]
+			elif (tag == 'HUSB'):
+				husband = args[0]
+			elif (tag == 'WIFE'):
+				wife = args[0]
+			elif (tag == 'CHIL'):
+				child = args[0]
+			elif (lastTag == 'MARR' and tag == 'DATE'):
+				married = " ".join(args)
+			elif (lastTag == 'DIV' and tag == 'DATE'):
+				divorced = " ".join(args)
+
+			lastTag = tag
+
+		#prints indiviual's info into table
+		if (valid and level == 0):
+
+			if (lastName != None):
+				INDI_tbl.add_row([indID, name, gender, birth, death])
+				indID = None
+				name = None
+				gender = None
+				birth = None
+				death = None
+
+			elif (husband != None):
+				FAM_tbl.add_row([famID, husband, wife])
+				famID = None
+				husband = None
+				wife = None
+				child = None
+				married = None
+				divorced = None
+
+print(INDI_tbl)
+print(FAM_tbl)
+
+#print(getIndividuals())
 
 conn.close()
