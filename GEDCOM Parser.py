@@ -2,7 +2,7 @@
 #|Author(s): Nestor Ouranitsas, Dakota Crouchelli                                    |#
 #|This script scans lines in a GEDCOM file for validity then prints a table of the   |#
 #|individuals and the families, along with other information found in the gedcom file|#
-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-
 
 import os
 import sqlite3
