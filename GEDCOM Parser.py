@@ -82,7 +82,7 @@ def addIndividual (idStr, firstName, lastName, gender, birth, death):
 		)
 
 	except sqlite3.IntegrityError as err:
-		print("Couldn't add individual " + idStr + ": " + str(err))
+		print("Couldn't add individual " + str(idStr) + ": " + str(err))
 		result = False
 
 	conn.commit()
@@ -102,7 +102,7 @@ def addFamily (idStr, married, divorced, husbID, wifeID):
 		)
 
 	except sqlite3.IntegrityError as err:
-		print("Couldn't add family " + idStr + ": " + str(err))
+		print("Couldn't add family " + str(idStr) + ": " + str(err))
 		result = False
 
 	conn.commit()
@@ -122,7 +122,7 @@ def addChild (childID, famID):
 		)
 
 	except sqlite3.IntegrityError as err:
-		print("Couldn't add child " + childID + ": " + str(err))
+		print("Couldn't add child " + str(childID) + ": " + str(err))
 		result = False
 
 	conn.commit()
@@ -263,7 +263,7 @@ if len(sys.argv) > 1:
 		if (valid and level == 0):
 
 			if (lastName != None):
-				INDI_tbl.add_row([indID, firstName, lastName, gender, birth, death])
+				addIndividual(indID, firstName, lastName, gender, birth, death)
 				indID = None
 				lastName = None
 				firstName = None
@@ -280,9 +280,9 @@ if len(sys.argv) > 1:
 				married = None
 				divorced = None
 
-print(INDI_tbl)
-print(FAM_tbl)
+#print(INDI_tbl)
+#print(FAM_tbl)
 
-#print(getIndividuals())
+print((getIndividuals()))
 
 conn.close()
