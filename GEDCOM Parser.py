@@ -212,6 +212,31 @@ if len(sys.argv) > 1:
 
 			# level is always first
 			level = int(words[0])
+			
+			#prints indiviual's info into table
+			if (level == 0):
+
+				if (lastName != None):
+					addIndividual(indID, firstName, lastName, gender, birth, death)
+					indID = None
+					lastName = None
+					firstName = None
+					gender = None
+					birth = None
+					death = None
+
+				elif (husband != None):
+					addFamily(famID, married, divorced, husband, wife)
+
+					for child in children:
+						addChild(child, famID)
+					
+					famID = None
+					husband = None
+					wife = None
+					married = None
+					divorced = None
+					children = []
 
 			# flag for INDI and FAM
 			badOrder = False
@@ -248,6 +273,7 @@ if len(sys.argv) > 1:
 				firstName = " ".join(args[0:-1])
 			elif (tag == 'SEX'):
 				gender = args[0]
+				print("" + str(indID) + str(gender))
 			elif (lastTag == 'BIRT' and tag == 'DATE'):
 				birth = " ".join(args)
 			elif (lastTag == 'DEAT' and tag == 'DATE'):
@@ -267,31 +293,6 @@ if len(sys.argv) > 1:
 				divorced = " ".join(args)
 
 			lastTag = tag
-
-		#prints indiviual's info into table
-		if (valid and level == 0):
-
-			if (lastName != None):
-				addIndividual(indID, firstName, lastName, gender, birth, death)
-				indID = None
-				lastName = None
-				firstName = None
-				gender = None
-				birth = None
-				death = None
-
-			elif (husband != None):
-				addFamily(famID, married, divorced, husband, wife)
-
-				for child in children:
-					addChild(child, famID)
-
-				famID = None
-				husband = None
-				wife = None
-				married = None
-				divorced = None
-				children = []
 
 #adding information from database into individual prettytable
 for i in getIndividuals():
