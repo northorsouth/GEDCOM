@@ -14,28 +14,15 @@ dbName = "GEDCOM.db"
 
 # Which tags can be on which lines
 tagRules =[
-	(0, 'INDI'),
-	(1, 'NAME'),
-	(1, 'SEX'),
-	(1, 'BIRT'),
-	(1, 'DEAT'),
-	(1, 'FAMC'),
-	(1, 'FAMS'),
-	(0, 'FAM'),
-	(1, 'MARR'),
-	(1, 'HUSB'),
-	(1, 'WIFE'),
-	(1, 'CHIL'),
-	(1, 'DIV'),
+	(0, 'INDI'), (0, 'FAM'), (0, 'HEAD'), (0, 'TRLR'), (0, 'NOTE')
+	(1, 'NAME'), (1, 'SEX'), (1, 'BIRT'), (1, 'DEAT'),(1, 'FAMC'), (1, 'FAMS'),
+	(1, 'MARR'), (1, 'HUSB'), (1, 'WIFE'), (1, 'CHIL'), (1, 'DIV'),
 	(2, 'DATE'),
-	(0, 'HEAD'),
-	(0, 'TRLR'),
-	(0, 'NOTE')
 ]
 
 # Call this function to initialize the database tables
 def dbInit():
-	
+
 	# Delete the database if it already exists
 	try:
 		os.remove(dbName);
@@ -44,7 +31,7 @@ def dbInit():
 
 	conn = sqlite3.connect(dbName)
 	curs = conn.cursor()
-	
+
 	# Individuals table
 	curs.execute('''CREATE TABLE individuals (
 		id 			TEXT	NOT NULL	PRIMARY KEY,
@@ -56,7 +43,7 @@ def dbInit():
 
 		CHECK (gender in ("M", "F"))
 	)''')
-	
+
 	# Families table
 	curs.execute('''CREATE TABLE families (
 		id 			TEXT	NOT NULL	PRIMARY KEY,
@@ -68,7 +55,7 @@ def dbInit():
 		FOREIGN KEY (husbID) REFERENCES individuals(id),
 		FOREIGN KEY (wifeID) REFERENCES individuals(id)
 	)''')
-	
+
 	# Children table (associates individuals with a family as a child
 	curs.execute('''CREATE TABLE children (
 		childID		TEXT	NOT NULL,
@@ -85,7 +72,7 @@ def dbInit():
 	return conn
 
 # Add an individual to the DB
-# Prints error and returns false if invalid 
+# Prints error and returns false if invalid
 def addIndividual (idStr, firstName, lastName, gender, birth, death):
 
 	result = True
@@ -107,7 +94,7 @@ def addIndividual (idStr, firstName, lastName, gender, birth, death):
 
 
 # Add an family to the DB (husband and wife must be already added)
-# Prints error and returns false if invalid 
+# Prints error and returns false if invalid
 def addFamily (idStr, married, divorced, husbID, wifeID):
 
 	result = True
@@ -129,7 +116,7 @@ def addFamily (idStr, married, divorced, husbID, wifeID):
 
 
 # Add a child t a family (family must already exist)
-# Prints error and returns false if invalid 
+# Prints error and returns false if invalid
 def addChild (childID, famID):
 
 	result = True
@@ -191,11 +178,11 @@ def getChildren(famID):
 	).fetchall()
 
 
-#Table for individuals
+# Table for individuals
 INDI_tbl = PrettyTable()
 INDI_tbl.field_names = ["ID","First Name","Last Name","Sex","Birth","Death"]
 
-#Table for families
+# Table for families
 FAM_tbl = PrettyTable()
 FAM_tbl.field_names = ["Family ID","Married","Divorced","Husband ID","Husband First Name", "Husband Last Name", "Wife ID", "Wife First Name", "Wife Last Name", "Children"]
 
@@ -204,7 +191,7 @@ if len(sys.argv) > 1:
 
 	# Create tables
 	conn = dbInit()
-	
+
 	# Zero out global variables
 	indID = None
 	firstName = None
@@ -249,7 +236,7 @@ if len(sys.argv) > 1:
 					gender = None
 					birth = None
 					death = None
-				
+
 				# Add a family to the database
 				elif (husband != None):
 					addFamily(famID, married, divorced, husband, wife)
@@ -273,7 +260,7 @@ if len(sys.argv) > 1:
 
 				tag = words[2]
 				args = [words[1]] + words[3:]
-				
+
 			else:
 				tag = words[1]
 				args = words[2:]
@@ -292,7 +279,7 @@ if len(sys.argv) > 1:
 				for tagRule in tagRules:
 					if tagRule[1]==tag and tagRule[0]==level:
 						valid = True
-			
+
 			# Assign attributes based on the tag parsed
 			if(tag == 'INDI'):
 				indID = args[0]
@@ -318,7 +305,7 @@ if len(sys.argv) > 1:
 				married = " ".join(args)
 			elif (lastTag == 'DIV' and tag == 'DATE'):
 				divorced = " ".join(args)
-			
+
 			# Keep track of the tag before this one for birth and death dates
 			lastTag = tag
 
