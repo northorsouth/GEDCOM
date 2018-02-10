@@ -183,7 +183,7 @@ if len(sys.argv) > 1:
 	famID = None
 	husband = None
 	wife = None
-	child = None
+	children = []
 	married = None
 	divorced = None
 
@@ -251,7 +251,7 @@ if len(sys.argv) > 1:
 			elif (tag == 'WIFE'):
 				wife = args[0]
 			elif (tag == 'CHIL'):
-				child = args[0]
+				children.append(args[0])
 			elif (lastTag == 'MARR' and tag == 'DATE'):
 				married = " ".join(args)
 			elif (lastTag == 'DIV' and tag == 'DATE'):
@@ -272,11 +272,14 @@ if len(sys.argv) > 1:
 				death = None
 
 			elif (husband != None):
-				FAM_tbl.add_row([famID, husband, wife])
+				addFamily(famID, married, divorced, husband, wife)
+				
+				for child in children:
+					addChild(child, famID)
+				
 				famID = None
 				husband = None
 				wife = None
-				child = None
 				married = None
 				divorced = None
 
