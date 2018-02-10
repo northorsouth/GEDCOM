@@ -24,9 +24,17 @@ tagRules =[
 	(0, 'TRLR'),
 	(0, 'NOTE')
 ]
+#Table for individuals
+INDI_tbl = PrettyTable()
+INDI_tbl.fieldnames = ["ID","Name","Sex","Birth","Death"]
+
+#Table for families
+FAM_tbl = PrettyTable()
+FAM_tbl.fieldnames = ["Family ID","Husband ID", "Wife ID"]
 
 # if a file name was passed in
 if len(sys.argv) > 1:
+
 
 	indID = ""
 	name = ""
@@ -113,21 +121,16 @@ if len(sys.argv) > 1:
 		#prints indiviual's info into table
 		if (valid and level == 0):
 
-			if (indID != ""):
-				#Table for individuals
-				INDI_tbl = PrettyTable()
-				INDI_tbl.fieldnames = ["ID","Name","Sex","Birth","Death"]
-
+			if (name != ""):
 				INDI_tbl.add_row([indID, name, gender, birth, death])
-				print(INDI_tbl)
+				name = ""
 
-			elif (famID != ""):
-				#Table for families
-				FAM_tbl = PrettyTable()
-				FAM_tbl.fieldnames = ["Family ID","Husband ID", "Wife ID"]
-
+			elif (husband != ""):
 				FAM_tbl.add_row([famID, husband, wife])
-				print(FAM_tbl)
+				husband = ""
+
+print(INDI_tbl)
+print(FAM_tbl)
 
 def dbInit():
 
