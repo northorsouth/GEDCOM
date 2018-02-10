@@ -36,18 +36,18 @@ FAM_tbl.field_names = ["Family ID","Husband ID", "Wife ID"]
 if len(sys.argv) > 1:
 
 
-	indID = ""
-	name = ""
-	gender = ""
-	birth = ""
-	death = "N/A"
+	indID = None
+	name = None
+	gender = None
+	birth = None
+	death = None
 
-	famID = ""
-	husband = ""
-	wife = ""
-	child = ""
-	married = ""
-	divorced = "N/A"
+	famID = None
+	husband = None
+	wife = None
+	child = None
+	married = None
+	divorced = None
 
 	lastTag = None
 
@@ -123,13 +123,22 @@ if len(sys.argv) > 1:
 		#prints indiviual's info into table
 		if (valid and level == 0):
 
-			if (name != ""):
+			if (name != None):
 				INDI_tbl.add_row([indID, name, gender, birth, death])
-				name = ""
+				indID = None
+				name = None
+				gender = None
+				birth = None
+				death = None
 
-			elif (husband != ""):
+			elif (husband != None):
 				FAM_tbl.add_row([famID, husband, wife])
-				husband = ""
+				famID = None
+				husband = None
+				wife = None
+				child = None
+				married = None
+				divorced = None
 
 print(INDI_tbl)
 print(FAM_tbl)
