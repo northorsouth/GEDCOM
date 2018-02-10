@@ -1,3 +1,9 @@
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+#|Author(s): Nestor Ouranitsas, Dakota Crouchelli                                    |#
+#|This script scans lines in a GEDCOM file for validity then prints a table of the   |#
+#|individuals and the families, along with other information found in the gedcom file|#
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+
 import os
 import sqlite3
 import sys
@@ -162,7 +168,7 @@ def getFamily(famID):
 
 
 def getChildren(famID):
-	
+
 	return conn.cursor().execute(
 		'SELECT childID FROM CHILDREN WHERE famID=?',
 		(famID,)
@@ -311,7 +317,7 @@ for k in getFamilies():
 	fam.insert(7, wife[1])
 	fam.insert(8, wife[2])
 	fam.insert(9, [x[0] for x in getChildren(fam[0])])
-	
+
 	FAM_tbl.add_row(fam)
 
 #prints table of families
