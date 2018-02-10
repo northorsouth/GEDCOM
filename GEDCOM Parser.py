@@ -26,11 +26,11 @@ tagRules =[
 ]
 #Table for individuals
 INDI_tbl = PrettyTable()
-INDI_tbl.fieldnames = ["ID","Name","Sex","Birth","Death"]
+INDI_tbl.field_names = ["ID","Name","Sex","Birth","Death"]
 
 #Table for families
 FAM_tbl = PrettyTable()
-FAM_tbl.fieldnames = ["Family ID","Husband ID", "Wife ID"]
+FAM_tbl.field_names = ["Family ID","Husband ID", "Wife ID"]
 
 # if a file name was passed in
 if len(sys.argv) > 1:
@@ -95,7 +95,7 @@ if len(sys.argv) > 1:
 						valid = True
 
 			if(tag == 'INDI'):
-				inID = args
+				indID = args
 			elif (tag == 'NAME'):
 				name = args
 			elif (tag == 'SEX'):
@@ -103,7 +103,7 @@ if len(sys.argv) > 1:
 			elif (lastTag == 'BIRT' and tag == 'DATE'):
 				birth = args
 			elif (lastTag == 'DEAT' and tag == 'DATE'):
-				birth = args
+				death = args
 
 			if (tag == 'FAM'):
 				famID = args
@@ -113,10 +113,12 @@ if len(sys.argv) > 1:
 				wife = args
 			elif (tag == 'CHIL'):
 				child = args
-			elif (lastTag == 'MARR' and tagg == 'DATE'):
+			elif (lastTag == 'MARR' and tag == 'DATE'):
 				married = args
 			elif (lastTag == 'DIV' and tag == 'DATE'):
 				divorced = args
+
+			lastTag = tag
 
 		#prints indiviual's info into table
 		if (valid and level == 0):
