@@ -14,10 +14,9 @@ dbName = "GEDCOM.db"
 
 # Which tags can be on which lines
 tagRules =[
-	(0, 'INDI'), (0, 'FAM'), (0, 'HEAD'), (0, 'TRLR'), (0, 'NOTE')
-	(1, 'NAME'), (1, 'SEX'), (1, 'BIRT'), (1, 'DEAT'),(1, 'FAMC'), (1, 'FAMS'),
-	(1, 'MARR'), (1, 'HUSB'), (1, 'WIFE'), (1, 'CHIL'), (1, 'DIV'),
-	(2, 'DATE'),
+	(0, 'INDI'),(0, 'FAM'),(0, 'HEAD'),(0, 'TRLR'),(0, 'NOTE'),
+	(1, 'NAME'),(1, 'SEX'),(1, 'BIRT'),(1, 'DEAT'),(1, 'FAMC'),(1, 'FAMS'),(1, 'MARR'),(1, 'HUSB'),(1, 'WIFE'),(1, 'CHIL'),(1, 'DIV'),
+	(2, 'DATE')
 ]
 
 # Call this function to initialize the database tables
