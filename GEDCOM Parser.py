@@ -58,12 +58,12 @@ def dbInit():
 	)''')
 
 	curs.execute('''CREATE TABLE children (
-		indID		TEXT	NOT NULL,
+		childID		TEXT	NOT NULL,
 		famID		TEXT	NOT NULL,
 
-		PRIMARY KEY (indID, famID),
+		PRIMARY KEY (childID, famID),
 
-		FOREIGN KEY (indID) REFERENCES individuals(id),
+		FOREIGN KEY (childID) REFERENCES individuals(id),
 		FOREIGN KEY (famID) REFERENCES families(id)
 	)''')
 
@@ -157,6 +157,15 @@ def getFamily(famID):
 	return conn.cursor().execute(
 		'SELECT * FROM FAMILIES WHERE id=?',
 		(famID,)
+	).fetchone()
+
+
+
+def getChildren(famID):
+	
+	return conn.cursor().execute(
+		'SELECT childID FROM CHILDREN WHERE famID=?',
+		(famID,)
 	).fetchall()
 
 
@@ -166,7 +175,7 @@ INDI_tbl.field_names = ["ID","First Name","Last Name","Sex","Birth","Death"]
 
 #Table for families
 FAM_tbl = PrettyTable()
-FAM_tbl.field_names = ["Family ID","Married","Divorced","Husband ID","Wife ID"]
+FAM_tbl.field_names = ["Family ID","Married","Divorced","Husband ID","Husband First Name", "Husband Last Name", "Wife ID", "Wife First Name", "Wife Last Name", "Children"]
 
 # if a file name was passed in
 if len(sys.argv) > 1:
@@ -293,7 +302,16 @@ print(INDI_tbl)
 
 #adding information from database into family prettytable
 for k in getFamilies():
-	FAM_tbl.add_row([x for x in k])
+	fam = [x for x in k]
+	husb = getIndividual(fam[3])
+	wife = getIndividual(fam[4])
+	fam.insert(4, husb[1])
+	fam.insert(5, husb[2])
+	fam.insert(7, wife[1])
+	fam.insert(8, wife[2])
+	fam.insert(9, [x[0] for x in getChildren(fam[0])])
+	
+	FAM_tbl.add_row(fam)
 
 #prints table of families
 print(FAM_tbl)
