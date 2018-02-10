@@ -9,8 +9,10 @@ import sqlite3
 import sys
 from prettytable import PrettyTable
 
+# Name of the database to be written to
 dbName = "GEDCOM.db"
 
+# Which tags can be on which lines
 tagRules =[
 	(0, 'INDI'),
 	(1, 'NAME'),
@@ -31,8 +33,10 @@ tagRules =[
 	(0, 'NOTE')
 ]
 
+# Call this function to initialize the database tables
 def dbInit():
-
+	
+	# Delete the database if it already exists
 	try:
 		os.remove(dbName);
 	except FileNotFoundError:
@@ -40,7 +44,8 @@ def dbInit():
 
 	conn = sqlite3.connect(dbName)
 	curs = conn.cursor()
-
+	
+	# Individuals table
 	curs.execute('''CREATE TABLE individuals (
 		id 			TEXT	NOT NULL	PRIMARY KEY,
 		firstName	TEXT	NOT NULL,
@@ -51,7 +56,8 @@ def dbInit():
 
 		CHECK (gender in ("M", "F"))
 	)''')
-
+	
+	# Families table
 	curs.execute('''CREATE TABLE families (
 		id 			TEXT	NOT NULL	PRIMARY KEY,
 		married		DATE	NOT NULL,
@@ -62,7 +68,8 @@ def dbInit():
 		FOREIGN KEY (husbID) REFERENCES individuals(id),
 		FOREIGN KEY (wifeID) REFERENCES individuals(id)
 	)''')
-
+	
+	# Children table (associates individuals with a family as a child
 	curs.execute('''CREATE TABLE children (
 		childID		TEXT	NOT NULL,
 		famID		TEXT	NOT NULL,
@@ -77,6 +84,8 @@ def dbInit():
 
 	return conn
 
+# Add an individual to the DB
+# Prints error and returns false if invalid 
 def addIndividual (idStr, firstName, lastName, gender, birth, death):
 
 	result = True
@@ -97,6 +106,8 @@ def addIndividual (idStr, firstName, lastName, gender, birth, death):
 
 
 
+# Add an family to the DB (husband and wife must be already added)
+# Prints error and returns false if invalid 
 def addFamily (idStr, married, divorced, husbID, wifeID):
 
 	result = True
@@ -117,6 +128,8 @@ def addFamily (idStr, married, divorced, husbID, wifeID):
 
 
 
+# Add a child t a family (family must already exist)
+# Prints error and returns false if invalid 
 def addChild (childID, famID):
 
 	result = True
@@ -136,13 +149,14 @@ def addChild (childID, famID):
 	return result
 
 
-
+# Get a list of all invdividuals as tuples
 def getIndividuals():
 
 	return conn.cursor().execute('SELECT * FROM INDIVIDUALS ORDER BY id').fetchall()
 
 
 
+# Get a certain individual by his ID
 def getIndividual(indID):
 
 	return conn.cursor().execute(
@@ -152,12 +166,14 @@ def getIndividual(indID):
 
 
 
+# Get a list of all families as tuples
 def getFamilies():
 
 	return conn.cursor().execute('SELECT * FROM FAMILIES ORDER BY id').fetchall()
 
 
 
+# Get a certain family by their ID
 def getFamily(famID):
 
 	return conn.cursor().execute(
@@ -166,7 +182,7 @@ def getFamily(famID):
 	).fetchone()
 
 
-
+# Get all children in a given family as an array of IDs
 def getChildren(famID):
 
 	return conn.cursor().execute(
@@ -186,8 +202,10 @@ FAM_tbl.field_names = ["Family ID","Married","Divorced","Husband ID","Husband Fi
 # if a file name was passed in
 if len(sys.argv) > 1:
 
+	# Create tables
 	conn = dbInit()
-
+	
+	# Zero out global variables
 	indID = None
 	firstName = None
 	lastName = None
@@ -219,9 +237,10 @@ if len(sys.argv) > 1:
 			# level is always first
 			level = int(words[0])
 
-			#prints indiviual's info into table
+			# If we're at level zero, we may have captured a person or family
 			if (level == 0):
 
+				# Add an individual to the database
 				if (lastName != None):
 					addIndividual(indID, firstName, lastName, gender, birth, death)
 					indID = None
@@ -230,7 +249,8 @@ if len(sys.argv) > 1:
 					gender = None
 					birth = None
 					death = None
-
+				
+				# Add a family to the database
 				elif (husband != None):
 					addFamily(famID, married, divorced, husband, wife)
 
@@ -253,6 +273,7 @@ if len(sys.argv) > 1:
 
 				tag = words[2]
 				args = [words[1]] + words[3:]
+				
 			else:
 				tag = words[1]
 				args = words[2:]
@@ -271,7 +292,8 @@ if len(sys.argv) > 1:
 				for tagRule in tagRules:
 					if tagRule[1]==tag and tagRule[0]==level:
 						valid = True
-
+			
+			# Assign attributes based on the tag parsed
 			if(tag == 'INDI'):
 				indID = args[0]
 			elif (tag == 'NAME'):
@@ -296,7 +318,8 @@ if len(sys.argv) > 1:
 				married = " ".join(args)
 			elif (lastTag == 'DIV' and tag == 'DATE'):
 				divorced = " ".join(args)
-
+			
+			# Keep track of the tag before this one for birth and death dates
 			lastTag = tag
 
 #adding information from database into individual prettytable
