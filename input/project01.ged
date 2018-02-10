@@ -25,12 +25,12 @@
 1 FAMC F01
 0 NOTE end Robert Johnson
 0 I04 INDI
-1 NAME Benjamin /Johnson
+1 NAME Benjamin /Johnson/
 1 SEX M
 1 BIRT
 2 DATE 12 OCT 1967
 1 FAMC F01
-0 NOTE end Benjamin Johnson
+0 NOTE end Benjamin Johnson/
 0 I05 INDI
 1 NAME Rebecca /Johnson/
 1 SEX F
@@ -91,7 +91,7 @@
 1 CHIL I09
 0 NOTE end FAM F02
 0 I10 INDI
-1 NAME Jennifer/ Broome/
+1 NAME Jennifer /Broome/
 1 SEX F
 1 BIRT
 2 DATE 1 SEP 1991
