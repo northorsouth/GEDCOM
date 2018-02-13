@@ -154,7 +154,7 @@ if len(sys.argv) > 1:
 			elif (lastTag == 'MARR' and tag == 'DATE'):
 				married = dateconvert(" ".join(args))
 			elif (lastTag == 'DIV' and tag == 'DATE'):
-				divorced = dateconver(" ".join(args))
+				divorced = dateconvert(" ".join(args))
 
 			# Keep track of the tag before this one for birth and death dates
 			lastTag = tag

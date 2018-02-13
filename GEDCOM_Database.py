@@ -22,7 +22,9 @@ def dbInit(dbName):
 		birth 		DATE	NOT NULL,
 		death 		DATE,
 
-		CHECK (gender in ("M", "F"))
+		CHECK (gender in ("M", "F")),
+		CHECK (birth < DATE('now')),
+		CHECK (death IS NULL OR death < DATE('now'))
 	)''')
 
 	# Families table
@@ -34,7 +36,9 @@ def dbInit(dbName):
 		wifeID 		TEXT	NOT NULL,
 
 		FOREIGN KEY (husbID) REFERENCES individuals(id),
-		FOREIGN KEY (wifeID) REFERENCES individuals(id)
+		FOREIGN KEY (wifeID) REFERENCES individuals(id),
+		CHECK (married < DATE('now')),
+		CHECK (divorced IS NULL OR divorced < DATE('now'))
 	)''')
 
 	# Children table (associates individuals with a family as a child
@@ -56,8 +60,6 @@ def dbInit(dbName):
 # Prints error and returns false if invalid
 def addIndividual (conn, idStr, firstName, lastName, gender, birth, death):
 
-	result = True
-
 	try:
 		conn.cursor().execute(
 			'INSERT INTO individuals VALUES (?, ?, ?, ?, ?, ?)',
@@ -66,19 +68,15 @@ def addIndividual (conn, idStr, firstName, lastName, gender, birth, death):
 
 	except sqlite3.IntegrityError as err:
 		print("Couldn't add individual " + str(idStr) + ": " + str(err))
-		result = False
+		return False
 
 	conn.commit()
-
-	return result
 
 
 
 # Add an family to the DB (husband and wife must be already added)
 # Prints error and returns false if invalid
 def addFamily (conn, idStr, married, divorced, husbID, wifeID):
-
-	result = True
 
 	try:
 		conn.cursor().execute(
@@ -88,11 +86,9 @@ def addFamily (conn, idStr, married, divorced, husbID, wifeID):
 
 	except sqlite3.IntegrityError as err:
 		print("Couldn't add family " + str(idStr) + ": " + str(err))
-		result = False
+		return False
 
 	conn.commit()
-
-	return result
 
 
 
