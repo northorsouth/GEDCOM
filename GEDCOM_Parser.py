@@ -5,6 +5,8 @@
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 import sys
+import math
+import datetime
 from prettytable import PrettyTable
 
 from GEDCOM_Database import *
@@ -18,14 +20,21 @@ tagRules =[
 	(2, 'DATE')
 ]
 
+#dictionary of months with numeric values as the keys
+monthnums = {'JAN':1,'FEB':2,'MAR':3,'APR':4,
+             'MAY':5,'JUN':6,'JUL':7,'AUG':8,
+             'SEP':9,'OCT':10,'NOV':11,'DEC':12}
 
-# Table for individuals
-INDI_tbl = PrettyTable()
-INDI_tbl.field_names = ["ID","First Name","Last Name","Sex","Birth","Death"]
 
-# Table for families
-FAM_tbl = PrettyTable()
-FAM_tbl.field_names = ["Family ID","Married","Divorced","Husband ID","Husband First Name", "Husband Last Name", "Wife ID", "Wife First Name", "Wife Last Name", "Children"]
+#converts gedcom date sting into a python date time (yr, month, day)
+def dateconvert(date):
+    #converts date1 to the GEDCOM date format into python timedate format
+    d = date.split()
+    day = int(d[0])
+    month = int(monthnums[d[1]])
+    year = int(d[2])
+
+    return datetime.date(year, month, day)
 
 # if a file name was passed in
 if len(sys.argv) > 1:
@@ -130,9 +139,9 @@ if len(sys.argv) > 1:
 			elif (tag == 'SEX'):
 				gender = args[0]
 			elif (lastTag == 'BIRT' and tag == 'DATE'):
-				birth = " ".join(args)
+				birth = dateconvert(" ".join(args))
 			elif (lastTag == 'DEAT' and tag == 'DATE'):
-				death = " ".join(args)
+				death = dateconvert(" ".join(args))
 
 			if (tag == 'FAM'):
 				famID = args[0]
@@ -143,12 +152,20 @@ if len(sys.argv) > 1:
 			elif (tag == 'CHIL'):
 				children.append(args[0])
 			elif (lastTag == 'MARR' and tag == 'DATE'):
-				married = " ".join(args)
+				married = dateconvert(" ".join(args))
 			elif (lastTag == 'DIV' and tag == 'DATE'):
-				divorced = " ".join(args)
+				divorced = dateconver(" ".join(args))
 
 			# Keep track of the tag before this one for birth and death dates
 			lastTag = tag
+
+# Table for individuals
+INDI_tbl = PrettyTable()
+INDI_tbl.field_names = ["ID","First Name","Last Name","Sex","Birth","Death"]
+
+# Table for families
+FAM_tbl = PrettyTable()
+FAM_tbl.field_names = ["Family ID","Married","Divorced","Husband ID","Husband First Name", "Husband Last Name", "Wife ID", "Wife First Name", "Wife Last Name", "Children"]
 
 #adding information from database into individual prettytable
 for i in getIndividuals(database):
