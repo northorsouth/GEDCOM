@@ -4,13 +4,12 @@
 #|individuals and the families, along with other information found in the gedcom file|#
 #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
-import os
-import sqlite3
 import sys
 from prettytable import PrettyTable
 
-# Name of the database to be written to
-dbName = "GEDCOM.db"
+from GEDCOM_Database import *
+
+database = None
 
 # Which tags can be on which lines
 tagRules =[
@@ -18,163 +17,6 @@ tagRules =[
 	(1, 'NAME'),(1, 'SEX'),(1, 'BIRT'),(1, 'DEAT'),(1, 'FAMC'),(1, 'FAMS'),(1, 'MARR'),(1, 'HUSB'),(1, 'WIFE'),(1, 'CHIL'),(1, 'DIV'),
 	(2, 'DATE')
 ]
-
-# Call this function to initialize the database tables
-def dbInit():
-
-	# Delete the database if it already exists
-	try:
-		os.remove(dbName);
-	except FileNotFoundError:
-		pass
-
-	conn = sqlite3.connect(dbName)
-	curs = conn.cursor()
-
-	# Individuals table
-	curs.execute('''CREATE TABLE individuals (
-		id 			TEXT	NOT NULL	PRIMARY KEY,
-		firstName	TEXT	NOT NULL,
-		lastName 	TEXT	NOT NULL,
-		gender 		TEXT	NOT NULL,
-		birth 		DATE	NOT NULL,
-		death 		DATE,
-
-		CHECK (gender in ("M", "F"))
-	)''')
-
-	# Families table
-	curs.execute('''CREATE TABLE families (
-		id 			TEXT	NOT NULL	PRIMARY KEY,
-		married		DATE	NOT NULL,
-		divorced 	DATE,
-		husbID 		TEXT	NOT NULL,
-		wifeID 		TEXT	NOT NULL,
-
-		FOREIGN KEY (husbID) REFERENCES individuals(id),
-		FOREIGN KEY (wifeID) REFERENCES individuals(id)
-	)''')
-
-	# Children table (associates individuals with a family as a child
-	curs.execute('''CREATE TABLE children (
-		childID		TEXT	NOT NULL,
-		famID		TEXT	NOT NULL,
-
-		PRIMARY KEY (childID, famID),
-
-		FOREIGN KEY (childID) REFERENCES individuals(id),
-		FOREIGN KEY (famID) REFERENCES families(id)
-	)''')
-
-	conn.commit()
-
-	return conn
-
-# Add an individual to the DB
-# Prints error and returns false if invalid
-def addIndividual (idStr, firstName, lastName, gender, birth, death):
-
-	result = True
-
-	try:
-		conn.cursor().execute(
-			'INSERT INTO individuals VALUES (?, ?, ?, ?, ?, ?)',
-			(idStr, firstName, lastName, gender, birth, death)
-		)
-
-	except sqlite3.IntegrityError as err:
-		print("Couldn't add individual " + str(idStr) + ": " + str(err))
-		result = False
-
-	conn.commit()
-
-	return result
-
-
-
-# Add an family to the DB (husband and wife must be already added)
-# Prints error and returns false if invalid
-def addFamily (idStr, married, divorced, husbID, wifeID):
-
-	result = True
-
-	try:
-		conn.cursor().execute(
-			'INSERT INTO families VALUES (?, ?, ?, ?, ?)',
-			(idStr, married, divorced, husbID, wifeID)
-		)
-
-	except sqlite3.IntegrityError as err:
-		print("Couldn't add family " + str(idStr) + ": " + str(err))
-		result = False
-
-	conn.commit()
-
-	return result
-
-
-
-# Add a child t a family (family must already exist)
-# Prints error and returns false if invalid
-def addChild (childID, famID):
-
-	result = True
-
-	try:
-		conn.cursor().execute(
-			'INSERT INTO children VALUES (?, ?)',
-			(childID, famID)
-		)
-
-	except sqlite3.IntegrityError as err:
-		print("Couldn't add child " + str(childID) + ": " + str(err))
-		result = False
-
-	conn.commit()
-
-	return result
-
-
-# Get a list of all invdividuals as tuples
-def getIndividuals():
-
-	return conn.cursor().execute('SELECT * FROM INDIVIDUALS ORDER BY id').fetchall()
-
-
-
-# Get a certain individual by his ID
-def getIndividual(indID):
-
-	return conn.cursor().execute(
-		'SELECT * FROM INDIVIDUALS WHERE id=?',
-		(indID,)
-	).fetchone()
-
-
-
-# Get a list of all families as tuples
-def getFamilies():
-
-	return conn.cursor().execute('SELECT * FROM FAMILIES ORDER BY id').fetchall()
-
-
-
-# Get a certain family by their ID
-def getFamily(famID):
-
-	return conn.cursor().execute(
-		'SELECT * FROM FAMILIES WHERE id=?',
-		(famID,)
-	).fetchone()
-
-
-# Get all children in a given family as an array of IDs
-def getChildren(famID):
-
-	return conn.cursor().execute(
-		'SELECT childID FROM CHILDREN WHERE famID=?',
-		(famID,)
-	).fetchall()
 
 
 # Table for individuals
@@ -189,7 +31,7 @@ FAM_tbl.field_names = ["Family ID","Married","Divorced","Husband ID","Husband Fi
 if len(sys.argv) > 1:
 
 	# Create tables
-	conn = dbInit()
+	database = dbInit("GEDCOM.db")
 
 	# Zero out global variables
 	indID = None
@@ -228,7 +70,7 @@ if len(sys.argv) > 1:
 
 				# Add an individual to the database
 				if (lastName != None):
-					addIndividual(indID, firstName, lastName, gender, birth, death)
+					addIndividual(database, indID, firstName, lastName, gender, birth, death)
 					indID = None
 					lastName = None
 					firstName = None
@@ -238,10 +80,10 @@ if len(sys.argv) > 1:
 
 				# Add a family to the database
 				elif (husband != None):
-					addFamily(famID, married, divorced, husband, wife)
+					addFamily(database, famID, married, divorced, husband, wife)
 
 					for child in children:
-						addChild(child, famID)
+						addChild(database, child, famID)
 
 					famID = None
 					husband = None
@@ -309,26 +151,26 @@ if len(sys.argv) > 1:
 			lastTag = tag
 
 #adding information from database into individual prettytable
-for i in getIndividuals():
+for i in getIndividuals(database):
 	INDI_tbl.add_row([x for x in i])
 
 #prints table of individuals
 print(INDI_tbl)
 
 #adding information from database into family prettytable
-for k in getFamilies():
+for k in getFamilies(database):
 	fam = [x for x in k]
-	husb = getIndividual(fam[3])
-	wife = getIndividual(fam[4])
+	husb = getIndividual(database, fam[3])
+	wife = getIndividual(database, fam[4])
 	fam.insert(4, husb[1])
 	fam.insert(5, husb[2])
 	fam.insert(7, wife[1])
 	fam.insert(8, wife[2])
-	fam.insert(9, [x[0] for x in getChildren(fam[0])])
+	fam.insert(9, [x[0] for x in getChildren(database, fam[0])])
 
 	FAM_tbl.add_row(fam)
 
 #prints table of families
 print(FAM_tbl)
 
-conn.close()
+database.close()
