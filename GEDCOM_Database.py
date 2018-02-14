@@ -6,7 +6,7 @@ def dbInit(dbName):
 
 	# Delete the database if it already exists
 	try:
-		os.remove(dbName);
+		os.remove(dbName)
 	except FileNotFoundError:
 		pass
 

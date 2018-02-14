@@ -14,16 +14,41 @@ from GEDCOM_Database import *
 database = None
 
 # Which tags can be on which lines
-tagRules =[
-	(0, 'INDI'),(0, 'FAM'),(0, 'HEAD'),(0, 'TRLR'),(0, 'NOTE'),
-	(1, 'NAME'),(1, 'SEX'),(1, 'BIRT'),(1, 'DEAT'),(1, 'FAMC'),(1, 'FAMS'),(1, 'MARR'),(1, 'HUSB'),(1, 'WIFE'),(1, 'CHIL'),(1, 'DIV'),
+tagRules = [
+	(0, 'INDI'),
+	(0, 'FAM'),
+	(0, 'HEAD'),
+	(0, 'TRLR'),
+	(0, 'NOTE'),
+	(1, 'NAME'),
+	(1, 'SEX'),
+	(1, 'BIRT'),
+	(1, 'DEAT'),
+	(1, 'FAMC'),
+	(1, 'FAMS'),
+	(1, 'MARR'),
+	(1, 'HUSB'),
+	(1, 'WIFE'),
+	(1, 'CHIL'),
+	(1, 'DIV'),
 	(2, 'DATE')
 ]
 
 #dictionary of months with numeric values as the keys
-monthnums = {'JAN':1,'FEB':2,'MAR':3,'APR':4,
-             'MAY':5,'JUN':6,'JUL':7,'AUG':8,
-             'SEP':9,'OCT':10,'NOV':11,'DEC':12}
+monthnums = {
+	'JAN':1,
+	'FEB':2,
+	'MAR':3,
+	'APR':4,
+	'MAY':5,
+	'JUN':6,
+	'JUL':7,
+	'AUG':8,
+	'SEP':9,
+	'OCT':10,
+	'NOV':11,
+	'DEC':12
+}
 
 
 #converts gedcom date sting into a python date time (yr, month, day)
@@ -36,13 +61,48 @@ def dateconvert(date):
 
     return datetime.date(year, month, day)
 
-# if a file name was passed in
-if len(sys.argv) > 1:
+def parseLine(line):
 
-	# Create tables
-	database = dbInit("GEDCOM.db")
+	valid = False
+	level = -1
+	tag = None
+	args = None
 
-	# Zero out global variables
+	# make sure this line has at least a level and a tag
+	words = line.split()
+	if len(words) >= 2:
+
+		# level is always first
+		level = int(words[0])
+
+		# flag for INDI and FAM
+		badOrder = False
+
+		# order is switched for INDI and FAM
+		if (len(words) >= 3 and
+			(words[2] == 'INDI' or words[2] == 'FAM')):
+
+			tag = words[2]
+			args = [words[1]] + words[3:]
+
+		else:
+			tag = words[1]
+			args = words[2:]
+
+			# INDI and FAM should have been found in block above
+			# if this trips, the order is wrong
+			if tag == 'INDI' or tag == 'FAM':
+				badOrder = True
+
+		# if we find a matching tag rule, and the level checks out
+		# tag is valid
+		valid = (not badOrder) and ((level, tag) in tagRules)
+	
+	return (valid, level, tag, args)
+
+def parseFile(database, filePath):
+
+	# Zero out variables
 	indID = None
 	firstName = None
 	lastName = None
@@ -60,19 +120,17 @@ if len(sys.argv) > 1:
 	lastTag = None
 
 	# loop through lines
-	for line in open(sys.argv[1]):
+	for line in open(filePath):
 
 		valid = False
 		level = -1
-		tag = None
+		newTag = None
 		args = None
+		
+		(valid, level, newTag, args) = parseLine(line)
 
-		# make sure this line has at least a level and a tag
-		words = line.split()
-		if len(words) >= 2:
-
-			# level is always first
-			level = int(words[0])
+		# Make sure this line is valid before we do anything
+		if (valid):
 
 			# If we're at level zero, we may have captured a person or family
 			if (level == 0):
@@ -101,71 +159,63 @@ if len(sys.argv) > 1:
 					divorced = None
 					children = []
 
-			# flag for INDI and FAM
-			badOrder = False
-
-			# order is switched for INDI and FAM
-			if (len(words) >= 3 and
-				(words[2] == 'INDI' or words[2] == 'FAM')):
-
-				tag = words[2]
-				args = [words[1]] + words[3:]
-
-			else:
-				tag = words[1]
-				args = words[2:]
-
-				# INDI and FAM should have been found in block above
-				# if this trips, the order is wrong
-				if tag == 'INDI' or tag == 'FAM':
-					badOrder = True
-
-			# guilty until proven innocent
-			valid = False
-
-			# if we find a matching tag rule, and the level checks out
-			# tag is valid
-			if not badOrder:
-				for tagRule in tagRules:
-					if tagRule[1]==tag and tagRule[0]==level:
-						valid = True
-
 			# Assign attributes based on the tag parsed
-			if(tag == 'INDI'):
+			if(newTag == 'INDI'):
 				indID = args[0]
-			elif (tag == 'NAME'):
+			elif (newTag == 'NAME'):
 				lastName = args[-1][1:-1]
 				firstName = " ".join(args[0:-1])
-			elif (tag == 'SEX'):
+			elif (newTag == 'SEX'):
 				gender = args[0]
-			elif (lastTag == 'BIRT' and tag == 'DATE'):
+			elif (lastTag == 'BIRT' and newTag == 'DATE'):
 				birth = dateconvert(" ".join(args))
-			elif (lastTag == 'DEAT' and tag == 'DATE'):
+			elif (lastTag == 'DEAT' and newTag == 'DATE'):
 				death = dateconvert(" ".join(args))
 
-			if (tag == 'FAM'):
+			if (newTag == 'FAM'):
 				famID = args[0]
-			elif (tag == 'HUSB'):
+			elif (newTag == 'HUSB'):
 				husband = args[0]
-			elif (tag == 'WIFE'):
+			elif (newTag == 'WIFE'):
 				wife = args[0]
-			elif (tag == 'CHIL'):
+			elif (newTag == 'CHIL'):
 				children.append(args[0])
-			elif (lastTag == 'MARR' and tag == 'DATE'):
+			elif (lastTag == 'MARR' and newTag == 'DATE'):
 				married = dateconvert(" ".join(args))
-			elif (lastTag == 'DIV' and tag == 'DATE'):
+			elif (lastTag == 'DIV' and newTag == 'DATE'):
 				divorced = dateconvert(" ".join(args))
 
 			# Keep track of the tag before this one for birth and death dates
-			lastTag = tag
+			lastTag = newTag
 
 # Table for individuals
-INDI_tbl = PrettyTable()
-INDI_tbl.field_names = ["ID","First Name","Last Name","Sex","Birth","Death"]
+INDI_tbl = PrettyTable(field_names = [
+	"ID",
+	"First Name",
+	"Last Name",
+	"Sex",
+	"Birth",
+	"Death"
+])
 
 # Table for families
-FAM_tbl = PrettyTable()
-FAM_tbl.field_names = ["Family ID","Married","Divorced","Husband ID","Husband First Name", "Husband Last Name", "Wife ID", "Wife First Name", "Wife Last Name", "Children"]
+FAM_tbl = PrettyTable(field_names = [
+	"Family ID",
+	"Married",
+	"Divorced",
+	"Husband ID",
+	"Husband First Name",
+	"Husband Last Name",
+	"Wife ID",
+	"Wife First Name",
+	"Wife Last Name",
+	"Children"
+])
+
+database = dbInit("GEDCOM.db")
+
+for file in sys.argv[1:]:
+	parseFile(database, file)
 
 #adding information from database into individual prettytable
 for i in getIndividuals(database):
