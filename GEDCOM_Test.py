@@ -15,12 +15,12 @@ class datesTest(unittest.TestCase):
     def setUp(self):
         print("\n\ntesting: " + self._testMethodName)
         self.database = db.dbInit("GEDCOM.db")
-    
+
     def tearDown(self):
         self.database.close()
-    
+
     def testSunnyDay(self):
-        
+
         # Table for individuals
         INDI_tbl = PrettyTable(field_names = [
             "ID",
@@ -155,10 +155,12 @@ class datesTest(unittest.TestCase):
 
     # validates the individual is born before their death date
     def test_birtBFORdeat(self):
+        self.assertFalse(parser.parseFile(self.database, "input/US03test.ged"))
         return
 
     # validates that a couple was married before they got divorced
     def test_marrBFORdiv(self):
+        self.assertFalse(parser.parseFile(self.database, "input/US04test.ged"))
         return
 
 unittest.main()

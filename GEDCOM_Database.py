@@ -25,7 +25,8 @@ def dbInit(dbName):
 		CONSTRAINT gender_m_or_f CHECK (gender in ("M", "F", "m", "f")),
 
 		CONSTRAINT birth_before_now CHECK (birth < DATE('now')),
-		CONSTRAINT death_before_now CHECK (death IS NULL OR death < DATE('now'))
+		CONSTRAINT death_before_now CHECK (death IS NULL OR death < DATE('now')),
+		CONSTRAINT birth_before_death CHECK (death IS NULL OR birth < death)
 	)''')
 
 	# Families table
@@ -40,7 +41,8 @@ def dbInit(dbName):
 		CONSTRAINT wife_exists		FOREIGN KEY (wifeID) REFERENCES individuals(id),
 
 		CONSTRAINT married_before_now  CHECK (married < DATE('now')),
-		CONSTRAINT divorced_before_now CHECK (divorced IS NULL OR divorced < DATE('now'))
+		CONSTRAINT divorced_before_now CHECK (divorced IS NULL OR divorced < DATE('now')),
+		CONSTRAINT married_before_divorce CHECK (divorced IS NULL OR married < divorced)
 	)''')
 
 	# Children table (associates individuals with a family as a child
@@ -55,7 +57,7 @@ def dbInit(dbName):
 	)''')
 
 	conn.commit()
-	
+
 	return conn
 
 # Add an individual to the DB
@@ -75,7 +77,6 @@ def addIndividual (conn, idStr, firstName, lastName, gender, birth, death):
 	conn.commit()
 
 	return True
-
 
 
 # Add an family to the DB (husband and wife must be already added)

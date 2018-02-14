@@ -1,1 +1,9 @@
 0 NOTE this is a test file for US03
+0 I01 INDI
+1 NAME Jimmy /Shoes/
+1 SEX M
+1 BIRT
+2 DATE 02 FEB 1986
+1 DEAT
+2 DATE 19 AUG 1984
+0 NOTE end Jimmy /Shoes/
