@@ -59,6 +59,8 @@ def dateconvert(date):
 
     return datetime.date(year, month, day)
 
+
+
 def parseLine(line):
 
 	valid = False
@@ -97,6 +99,8 @@ def parseLine(line):
 		valid = (not badOrder) and ((level, tag) in tagRules)
 	
 	return (valid, level, tag, args)
+
+
 
 def parseText(database, gedText):
 
@@ -192,6 +196,8 @@ def parseText(database, gedText):
 			lastTag = newTag
 	
 	return noErrors
+
+
 
 def parseFile(database, filePath):
 
