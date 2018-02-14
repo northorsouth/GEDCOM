@@ -9,7 +9,7 @@ import math
 import datetime
 from prettytable import PrettyTable
 
-from GEDCOM_Database import *
+import GEDCOM_Database as db
 
 database = None
 
@@ -137,7 +137,7 @@ def parseFile(database, filePath):
 
 				# Add an individual to the database
 				if (lastName != None):
-					addIndividual(database, indID, firstName, lastName, gender, birth, death)
+					db.addIndividual(database, indID, firstName, lastName, gender, birth, death)
 					indID = None
 					lastName = None
 					firstName = None
@@ -147,10 +147,10 @@ def parseFile(database, filePath):
 
 				# Add a family to the database
 				elif (husband != None):
-					addFamily(database, famID, married, divorced, husband, wife)
+					db.addFamily(database, famID, married, divorced, husband, wife)
 
 					for child in children:
-						addChild(database, child, famID)
+						db.addChild(database, child, famID)
 
 					famID = None
 					husband = None
@@ -212,28 +212,28 @@ FAM_tbl = PrettyTable(field_names = [
 	"Children"
 ])
 
-database = dbInit("GEDCOM.db")
+database = db.dbInit("GEDCOM.db")
 
 for file in sys.argv[1:]:
 	parseFile(database, file)
 
 #adding information from database into individual prettytable
-for i in getIndividuals(database):
+for i in db.getIndividuals(database):
 	INDI_tbl.add_row([x for x in i])
 
 #prints table of individuals
 print(INDI_tbl)
 
 #adding information from database into family prettytable
-for k in getFamilies(database):
+for k in db.getFamilies(database):
 	fam = [x for x in k]
-	husb = getIndividual(database, fam[3])
-	wife = getIndividual(database, fam[4])
+	husb = db.getIndividual(database, fam[3])
+	wife = db.getIndividual(database, fam[4])
 	fam.insert(4, husb[1])
 	fam.insert(5, husb[2])
 	fam.insert(7, wife[1])
 	fam.insert(8, wife[2])
-	fam.insert(9, [x[0] for x in getChildren(database, fam[0])])
+	fam.insert(9, [x[0] for x in db.getChildren(database, fam[0])])
 
 	FAM_tbl.add_row(fam)
 
