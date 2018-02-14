@@ -22,9 +22,10 @@ def dbInit(dbName):
 		birth 		DATE	NOT NULL,
 		death 		DATE,
 
-		CHECK (gender in ("M", "F")),
-		CHECK (birth < DATE('now')),
-		CHECK (death IS NULL OR death < DATE('now'))
+		CONSTRAINT gender_m_or_f CHECK (gender in ("M", "F", "m", "f")),
+
+		CONSTRAINT birth_before_now CHECK (birth < DATE('now')),
+		CONSTRAINT death_before_now CHECK (death IS NULL OR death < DATE('now'))
 	)''')
 
 	# Families table
@@ -35,10 +36,11 @@ def dbInit(dbName):
 		husbID 		TEXT	NOT NULL,
 		wifeID 		TEXT	NOT NULL,
 
-		FOREIGN KEY (husbID) REFERENCES individuals(id),
-		FOREIGN KEY (wifeID) REFERENCES individuals(id),
-		CHECK (married < DATE('now')),
-		CHECK (divorced IS NULL OR divorced < DATE('now'))
+		CONSTRAINT husband_exists	FOREIGN KEY (husbID) REFERENCES individuals(id),
+		CONSTRAINT wife_exists		FOREIGN KEY (wifeID) REFERENCES individuals(id),
+
+		CONSTRAINT married_before_now  CHECK (married < DATE('now')),
+		CONSTRAINT divorced_before_now CHECK (divorced IS NULL OR divorced < DATE('now'))
 	)''')
 
 	# Children table (associates individuals with a family as a child

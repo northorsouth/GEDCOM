@@ -10,12 +10,16 @@ class datesTest(unittest.TestCase):
 
     # validates all dates are before the current date
     def test_dateBFORcurrent(self):
+        return
 
     # validates the individual is born before marriage
     def test_birtBFORmarr(self):
+        return
 
     # validates the individual is born before their death date
     def test_birtBFORdeat(self):
+        return
 
     # validates that a couple was married before they got divorced
     def test_marrBFORdiv(self):
+        return
