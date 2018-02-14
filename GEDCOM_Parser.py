@@ -11,8 +11,6 @@ from prettytable import PrettyTable
 
 import GEDCOM_Database as db
 
-database = None
-
 # Which tags can be on which lines
 tagRules = [
 	(0, 'INDI'),
@@ -100,7 +98,9 @@ def parseLine(line):
 	
 	return (valid, level, tag, args)
 
-def parseFile(database, filePath):
+def parseText(database, gedText):
+
+	noErrors = True
 
 	# Zero out variables
 	indID = None
@@ -120,7 +120,7 @@ def parseFile(database, filePath):
 	lastTag = None
 
 	# loop through lines
-	for line in open(filePath):
+	for line in gedText.splitlines():
 
 		valid = False
 		level = -1
@@ -137,7 +137,9 @@ def parseFile(database, filePath):
 
 				# Add an individual to the database
 				if (lastName != None):
-					db.addIndividual(database, indID, firstName, lastName, gender, birth, death)
+
+					noErrors = db.addIndividual(database, indID, firstName, lastName, gender, birth, death) and noErrors
+					
 					indID = None
 					lastName = None
 					firstName = None
@@ -147,10 +149,11 @@ def parseFile(database, filePath):
 
 				# Add a family to the database
 				elif (husband != None):
-					db.addFamily(database, famID, married, divorced, husband, wife)
+					
+					noErrors  = db.addFamily(database, famID, married, divorced, husband, wife) and noErrors
 
 					for child in children:
-						db.addChild(database, child, famID)
+						noErrors  = db.addChild(database, child, famID) and noErrors
 
 					famID = None
 					husband = None
@@ -187,57 +190,10 @@ def parseFile(database, filePath):
 
 			# Keep track of the tag before this one for birth and death dates
 			lastTag = newTag
+	
+	return noErrors
 
-# Table for individuals
-INDI_tbl = PrettyTable(field_names = [
-	"ID",
-	"First Name",
-	"Last Name",
-	"Sex",
-	"Birth",
-	"Death"
-])
+def parseFile(database, filePath):
 
-# Table for families
-FAM_tbl = PrettyTable(field_names = [
-	"Family ID",
-	"Married",
-	"Divorced",
-	"Husband ID",
-	"Husband First Name",
-	"Husband Last Name",
-	"Wife ID",
-	"Wife First Name",
-	"Wife Last Name",
-	"Children"
-])
-
-database = db.dbInit("GEDCOM.db")
-
-for file in sys.argv[1:]:
-	parseFile(database, file)
-
-#adding information from database into individual prettytable
-for i in db.getIndividuals(database):
-	INDI_tbl.add_row([x for x in i])
-
-#prints table of individuals
-print(INDI_tbl)
-
-#adding information from database into family prettytable
-for k in db.getFamilies(database):
-	fam = [x for x in k]
-	husb = db.getIndividual(database, fam[3])
-	wife = db.getIndividual(database, fam[4])
-	fam.insert(4, husb[1])
-	fam.insert(5, husb[2])
-	fam.insert(7, wife[1])
-	fam.insert(8, wife[2])
-	fam.insert(9, [x[0] for x in db.getChildren(database, fam[0])])
-
-	FAM_tbl.add_row(fam)
-
-#prints table of families
-print(FAM_tbl)
-
-database.close()
+	with open(filePath) as file:
+		return parseText(database, file.read())

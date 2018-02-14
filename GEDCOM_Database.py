@@ -74,6 +74,8 @@ def addIndividual (conn, idStr, firstName, lastName, gender, birth, death):
 
 	conn.commit()
 
+	return True
+
 
 
 # Add an family to the DB (husband and wife must be already added)
@@ -92,13 +94,13 @@ def addFamily (conn, idStr, married, divorced, husbID, wifeID):
 
 	conn.commit()
 
+	return True
+
 
 
 # Add a child t a family (family must already exist)
 # Prints error and returns false if invalid
 def addChild (conn, childID, famID):
-
-	result = True
 
 	try:
 		conn.cursor().execute(
@@ -108,11 +110,11 @@ def addChild (conn, childID, famID):
 
 	except sqlite3.IntegrityError as err:
 		print("Couldn't add child " + str(childID) + ": " + str(err))
-		result = False
+		return False
 
 	conn.commit()
 
-	return result
+	return True
 
 
 # Get a list of all invdividuals as tuples
