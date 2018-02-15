@@ -74,7 +74,7 @@ class datesTest(unittest.TestCase):
     def test_dateBFORcurrent(self):
 
         badBday = '''
-            0 @I01@ INDI
+            0 @I1@ INDI
             1 NAME Bad /Birthday/
             1 SEX M
             1 BIRT
@@ -83,7 +83,7 @@ class datesTest(unittest.TestCase):
         '''
 
         badDday = '''
-            0 @I02@ INDI
+            0 @I2@ INDI
             1 NAME Bad /Deathday/
             1 SEX M
             1 BIRT
@@ -94,7 +94,7 @@ class datesTest(unittest.TestCase):
         '''
 
         goodGuy = '''
-            0 @I03@ INDI
+            0 @I3@ INDI
             1 NAME Good /Guy1/
             1 SEX M
             1 BIRT
@@ -106,7 +106,7 @@ class datesTest(unittest.TestCase):
         '''
 
         goodGirl = '''
-            0 @I04@ INDI
+            0 @I4@ INDI
             1 NAME Good /Girl1/
             1 SEX F
             1 BIRT
@@ -148,19 +148,143 @@ class datesTest(unittest.TestCase):
         self.assertFalse(parser.parseText(self.database, badMar))
 
         self.assertFalse(parser.parseText(self.database, badDiv))
+    
+    # Validates that the spouses must already exist for a family to be created
+    def test_spousesExist(self):
+
+        goodGuy = '''
+            0 @I3@ INDI
+            1 NAME Good /Guy1/
+            1 SEX M
+            1 BIRT
+            2 DATE 25 APR 1919
+            1 DEAT
+            2 DATE 13 SEP 1939
+            1 FAMS @F1@
+            0 TRLR
+        '''
+
+        fam1 = '''
+            0 @F1@ FAM
+            1 HUSB @I3@
+            1 WIFE @I4@
+            1 MARR
+            2 DATE 19 APR 1960
+            0 TRLR
+        '''
+
+        self.assertTrue(parser.parseText(self.database, goodGuy))
+
+        self.assertFalse(parser.parseText(self.database, fam1))
+
+        goodGirl = '''
+            0 @I5@ INDI
+            1 NAME Good /Girl1/
+            1 SEX F
+            1 BIRT
+            2 DATE 25 APR 1920
+            1 DEAT
+            2 DATE 13 SEP 1940
+            1 FAMS @F2@
+            0 TRLR
+        '''
+
+        fam2 = '''
+            0 @F2@ FAM
+            1 HUSB @I6@
+            1 WIFE @I5@
+            1 MARR
+            2 DATE 19 APR 1960
+            0 TRLR
+        '''
+
+        self.assertTrue(parser.parseText(self.database, goodGirl))
+
+        self.assertFalse(parser.parseText(self.database, fam2))
 
     # validates the individual is born before marriage
     def test_birtBFORmarr(self):
-        return
+
+        # Wife was born after wedding
+        guy1 = '''
+            0 @I3@ INDI
+            1 NAME Woody /Allen/
+            1 SEX M
+            1 BIRT
+            2 DATE 25 APR 1920
+            1 FAMS @F1@
+            0 TRLR
+            '''
+
+        girl1 = '''
+            0 @I4@ INDI
+            1 NAME Soon Yi /Previn/
+            1 SEX F
+            1 BIRT
+            2 DATE 25 APR 1950
+            1 FAMS @F1@
+            0 TRLR
+        '''
+
+        fam1 = '''
+            0 @F1@ FAM
+            1 HUSB @I3@
+            1 WIFE @I4@
+            1 MARR
+            2 DATE 19 APR 1940
+            0 TRLR
+        '''
+
+        self.assertTrue(parser.parseText(self.database, guy1))
+
+        self.assertTrue(parser.parseText(self.database, girl1))
+
+        self.assertFalse(parser.parseText(self.database, fam1))
+
+        # husband was born after wedding
+        guy2 = '''
+            0 @I5@ INDI
+            1 NAME Woody /Allen/
+            1 SEX M
+            1 BIRT
+            2 DATE 25 APR 1950
+            1 FAMS @F2@
+            0 TRLR
+            '''
+
+        girl2 = '''
+            0 @I6@ INDI
+            1 NAME Soon Yi /Previn/
+            1 SEX F
+            1 BIRT
+            2 DATE 25 APR 1920
+            1 FAMS @F2@
+            0 TRLR
+        '''
+
+        fam2 = '''
+            0 @F2@ FAM
+            1 HUSB @I5@
+            1 WIFE @I6@
+            1 MARR
+            2 DATE 19 APR 1940
+            0 TRLR
+        '''
+
+        self.assertTrue(parser.parseText(self.database, guy2))
+
+        self.assertTrue(parser.parseText(self.database, girl2))
+
+        self.assertFalse(parser.parseText(self.database, fam2))
 
     # validates the individual is born before their death date
     def test_birtBFORdeat(self):
+
         self.assertFalse(parser.parseFile(self.database, "input/US03test.ged"))
-        return
 
     # validates that a couple was married before they got divorced
     def test_marrBFORdiv(self):
+
         self.assertFalse(parser.parseFile(self.database, "input/US04test.ged"))
-        return
 
 unittest.main()

@@ -13,6 +13,8 @@ def dbInit(dbName):
 	conn = sqlite3.connect(dbName)
 	curs = conn.cursor()
 
+	curs.execute("PRAGMA foreign_keys = ON")
+
 	# Individuals table
 	curs.execute('''CREATE TABLE individuals (
 		id 			TEXT	NOT NULL	PRIMARY KEY,
@@ -92,8 +94,22 @@ def addFamily (conn, idStr, married, divorced, husbID, wifeID):
 	except sqlite3.IntegrityError as err:
 		print("Couldn't add family " + str(idStr) + ": " + str(err))
 		return False
-
+	
 	conn.commit()
+	
+	impossibleSpouses = [row[0] for row in conn.cursor().execute('''
+		SELECT individuals.id
+		FROM
+			individuals INNER JOIN families
+			ON (individuals.id=families.husbID OR individuals.id=families.wifeID)
+		WHERE families.id = ? AND individuals.birth >= families.married''',
+		(idStr,)
+	).fetchall()]
+
+	if (len(impossibleSpouses) > 0):
+		for s in impossibleSpouses:
+			print("Individual " + s + " was born on or before his wedding day")
+		return False
 
 	return True
 
