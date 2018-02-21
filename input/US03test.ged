@@ -1,9 +1,31 @@
 0 NOTE this is a test file for US03
-0 I01 INDI
+0 I25 INDI
 1 NAME Jimmy /Shoes/
 1 SEX M
 1 BIRT
-2 DATE 02 FEB 1986
+2 DATE 02 FEB 1984
 1 DEAT
-2 DATE 19 AUG 1984
-0 NOTE end Jimmy /Shoes/
+2 DATE 19 AUG 1982
+0 NOTE death 2 years before birth
+0 I26 INDI
+1 NAME Robert /Johnson/
+1 SEX M
+1 BIRT
+2 DATE 20 JUN 2020
+1 DEAT
+2 DATE 22 AUG 2022
+0 NOTE Legal birth in the future
+0 I27 INDI
+1 NAME Pappy /Smacks/
+1 SEX F
+1 DEAT
+2 DATE 7 JUL 1955
+0 NOTE NO BIRTH DATE
+0 INDI
+1 NAME DudeBro /Johanson/
+1 SEX M
+1 BIRT
+2 DATE 9 FEB 1986
+1 DEAT
+2 DATE 22 AUG 1984
+0 NOTE no ID given
