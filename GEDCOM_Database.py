@@ -209,8 +209,6 @@ def validateDatabase(conn):
 			print("ERROR(US02 Birth Before Marriage): Individual " + s + " was born on or before his/her wedding day")
 		return False
 
-	print(str(impossibleSpouses))
-
 	#US04
 	futuremarriage = [row[0] for row in conn.cursor().execute('''
 		SELECT families.id
@@ -236,4 +234,4 @@ def validateDatabase(conn):
 	#FOREIGN KEY (childID) REFERENCES individuals(id),
 	#FOREIGN KEY (famID) REFERENCES families(id)
 
-	return True;
+	return True

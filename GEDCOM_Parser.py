@@ -194,8 +194,10 @@ def parseText(database, gedText):
 
 			# Keep track of the tag before this one for birth and death dates
 			lastTag = newTag
+	
+	valid = db.validateDatabase(database)
 
-	return noErrors and db.validateDatabase(database)
+	return (noErrors and valid)
 
 
 

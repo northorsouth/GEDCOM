@@ -202,8 +202,8 @@ class datesTest(unittest.TestCase):
 
         self.assertFalse(parser.parseText(self.database, fam2))
 
-    # validates the individual is born before marriage
-    def test_birtBFORmarr(self):
+    # Wife was born after wedding
+    def test_birtBFORmarr_1(self):
 
         # Wife was born after wedding
         guy1 = '''
@@ -241,7 +241,8 @@ class datesTest(unittest.TestCase):
 
         self.assertFalse(parser.parseText(self.database, fam1))
 
-        # husband was born after wedding
+    # husband was born after wedding
+    def test_birtBFORmarr_2(self):
         guy2 = '''
             0 @I5@ INDI
             1 NAME Woody /Allen/
