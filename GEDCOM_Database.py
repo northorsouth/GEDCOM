@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import datetime
 import os
 
 # Call this function to initialize the database tables
@@ -111,6 +112,7 @@ def addFamily (conn, idStr, married, divorced, husbID, wifeID):
 		return False
 	if (getIndividual(conn, husbID) is None):
 		print("ERROR: FAMILY: Can't add Family, husband does not exist")
+		return False
 
 	try:
 		conn.cursor().execute(
@@ -200,6 +202,59 @@ def getChildren(conn, famID):
 
 def validateDatabase(conn):
 
+	#US01 - dates before current date
+	futurebirths = [
+		indi[0] for indi in
+		filter(
+			lambda indi: indi[4] > str(datetime.now()),
+			getIndividuals(conn)
+		)
+	]
+
+	if (len(futurebirths) > 0):
+		for s in futurebirths:
+			print("ERROR(US01 Dates Before Current Date): Individual " + s + " was born after today.")
+		return False
+	
+	futuredeaths = [
+		indi[0] for indi in
+		filter(
+			lambda indi: indi[5] != None and indi[5] > str(datetime.now()),
+			getIndividuals(conn)
+		)
+	]
+
+	if (len(futuredeaths) > 0):
+		for s in futuredeaths:
+			print("ERROR(US01 Dates Before Current Date): Individual " + s + " died after today.")
+		return False
+	
+	furturemarriages = [
+		fam[0] for fam in
+		filter(
+			lambda fam: fam[1] > str(datetime.now()),
+			getFamilies(conn)
+		)
+	]
+
+	if (len(furturemarriages) > 0):
+		for s in furturemarriages:
+			print("ERROR(US01 Dates Before Current Date): Family " + s + " was married after today.")
+		return False
+	
+	futuredivorces = [
+		fam[0] for fam in
+		filter(
+			lambda fam: fam[2] != None and fam[2] > str(datetime.now()),
+			getFamilies(conn)
+		)
+	]
+
+	if (len(futuredivorces) > 0):
+		for s in futuredivorces:
+			print("ERROR(US01 Dates Before Current Date): Family " + s + " was divorced after today.")
+		return False
+	
 	#US02 - birth before marriage
 	impossibleSpouses = [row[0] for row in conn.cursor().execute('''
 		SELECT individuals.id
@@ -215,14 +270,14 @@ def validateDatabase(conn):
 		return False
 
 	#US03 - death before birth
-	futurebirth = [row[0] for row in conn.cursor().execute('''
+	backwardsbirths = [row[0] for row in conn.cursor().execute('''
 		SELECT individuals.id
 		FROM individuals
 		WHERE (individuals.death NOT NULL) AND (individuals.birth > individuals.death) '''
 	).fetchall()]
 
-	if (len(futurebirth) > 0):
-		for s in futurebirth:
+	if (len(backwardsbirths) > 0):
+		for s in backwardsbirths:
 			print("ERROR(US03 Marriage Before Divorce): Individual " + s + " is born after their death.")
 		return False
 

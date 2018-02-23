@@ -199,9 +199,65 @@ def parseText(database, gedText):
 
 	return (noErrors and valid)
 
-
-
 def parseFile(database, filePath):
 
 	with open(filePath) as file:
 		return parseText(database, file.read())
+
+def printDatabase(database):
+	
+	# Table for individuals
+	INDI_tbl = PrettyTable(field_names = [
+		"ID",
+		"First Name",
+		"Last Name",
+		"Sex",
+		"Birth",
+		"Death"
+	])
+
+	# Table for families
+	FAM_tbl = PrettyTable(field_names = [
+		"Family ID",
+		"Married",
+		"Divorced",
+		"Husband ID",
+		"Husband First Name",
+		"Husband Last Name",
+		"Wife ID",
+		"Wife First Name",
+		"Wife Last Name",
+		"Children"
+	])
+
+	#adding information from database into individual prettytable
+	for i in db.getIndividuals(database):
+		INDI_tbl.add_row([x for x in i])
+
+	#prints table of individuals
+	print(INDI_tbl)
+
+	#adding information from database into family prettytable
+	for k in db.getFamilies(database):
+		fam = [x for x in k]
+		husb = db.getIndividual(database, fam[3])
+		wife = db.getIndividual(database, fam[4])
+		fam.insert(4, husb[1])
+		fam.insert(5, husb[2])
+		fam.insert(7, wife[1])
+		fam.insert(8, wife[2])
+		fam.insert(9, [x[0] for x in db.getChildren(database, fam[0])])
+
+		FAM_tbl.add_row(fam)
+
+	#prints table of families
+	print(FAM_tbl)
+
+if len(sys.argv) > 1:
+
+	database = db.dbInit("GEDCOM.db")
+
+	for filepath in sys.argv[1:]:
+		parseFile(database, filepath)
+	
+	printDatabase(database)

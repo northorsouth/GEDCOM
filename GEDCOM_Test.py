@@ -21,57 +21,12 @@ class datesTest(unittest.TestCase):
 
     def testSunnyDay(self):
 
-        # Table for individuals
-        INDI_tbl = PrettyTable(field_names = [
-            "ID",
-            "First Name",
-            "Last Name",
-            "Sex",
-            "Birth",
-            "Death"
-        ])
-
-        # Table for families
-        FAM_tbl = PrettyTable(field_names = [
-            "Family ID",
-            "Married",
-            "Divorced",
-            "Husband ID",
-            "Husband First Name",
-            "Husband Last Name",
-            "Wife ID",
-            "Wife First Name",
-            "Wife Last Name",
-            "Children"
-        ])
-
         parser.parseFile(self.database, "input/project03test.ged")
 
-        #adding information from database into individual prettytable
-        for i in db.getIndividuals(self.database):
-            INDI_tbl.add_row([x for x in i])
-
-        #prints table of individuals
-        print(INDI_tbl)
-
-        #adding information from database into family prettytable
-        for k in db.getFamilies(self.database):
-            fam = [x for x in k]
-            husb = db.getIndividual(self.database, fam[3])
-            wife = db.getIndividual(self.database, fam[4])
-            fam.insert(4, husb[1])
-            fam.insert(5, husb[2])
-            fam.insert(7, wife[1])
-            fam.insert(8, wife[2])
-            fam.insert(9, [x[0] for x in db.getChildren(self.database, fam[0])])
-
-            FAM_tbl.add_row(fam)
-
-        #prints table of families
-        print(FAM_tbl)
+        parser.printDatabase(self.database)
 
     # validates all dates are before the current date
-    def test_dateBFORcurrent(self):
+    def test_dateBFORcurrent_1(self):
 
         badBday = '''
             0 @I1@ INDI
@@ -81,6 +36,11 @@ class datesTest(unittest.TestCase):
             2 DATE 25 APR 2030
             0 TRLR
         '''
+
+        self.assertFalse(parser.parseText(self.database, badBday))
+
+    # validates all dates are before the current date
+    def test_dateBFORcurrent_2(self):
 
         badDday = '''
             0 @I2@ INDI
@@ -92,6 +52,11 @@ class datesTest(unittest.TestCase):
             2 DATE 13 SEP 2030
             0 TRLR
         '''
+
+        self.assertFalse(parser.parseText(self.database, badDday))
+
+    # validates all dates are before the current date
+    def test_dateBFORcurrent_3(self):
 
         goodGuy = '''
             0 @I3@ INDI
@@ -126,6 +91,39 @@ class datesTest(unittest.TestCase):
             0 TRLR
         '''
 
+        self.assertTrue(parser.parseText(self.database, goodGuy))
+
+        self.assertTrue(parser.parseText(self.database, goodGirl))
+
+        self.assertFalse(parser.parseText(self.database, badMar))
+
+    # validates all dates are before the current date
+    def test_dateBFORcurrent_4(self):
+
+        goodGuy = '''
+            0 @I3@ INDI
+            1 NAME Good /Guy1/
+            1 SEX M
+            1 BIRT
+            2 DATE 25 APR 1919
+            1 DEAT
+            2 DATE 13 SEP 1939
+            1 FAMS @F1@
+            0 TRLR
+        '''
+
+        goodGirl = '''
+            0 @I4@ INDI
+            1 NAME Good /Girl1/
+            1 SEX F
+            1 BIRT
+            2 DATE 25 APR 1920
+            1 DEAT
+            2 DATE 13 SEP 1940
+            1 FAMS @F1@
+            0 TRLR
+        '''
+
         badDiv = '''
             0 @F1@ FAM
             1 HUSB @I3@
@@ -137,20 +135,14 @@ class datesTest(unittest.TestCase):
             0 TRLR
         '''
 
-        self.assertFalse(parser.parseText(self.database, badBday))
-
-        self.assertFalse(parser.parseText(self.database, badDday))
-
         self.assertTrue(parser.parseText(self.database, goodGuy))
 
         self.assertTrue(parser.parseText(self.database, goodGirl))
 
-        self.assertFalse(parser.parseText(self.database, badMar))
-
         self.assertFalse(parser.parseText(self.database, badDiv))
 
     # Validates that the spouses must already exist for a family to be created
-    def test_spousesExist(self):
+    def test_spousesExist_1(self):
 
         goodGuy = '''
             0 @I3@ INDI
@@ -176,7 +168,9 @@ class datesTest(unittest.TestCase):
         self.assertTrue(parser.parseText(self.database, goodGuy))
 
         self.assertFalse(parser.parseText(self.database, fam1))
-
+    
+    # Validates that the spouses must already exist for a family to be created
+    def test_spousesExist_2(self):
         goodGirl = '''
             0 @I5@ INDI
             1 NAME Good /Girl1/
