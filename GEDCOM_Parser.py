@@ -97,7 +97,7 @@ def parseLine(line):
 		# if we find a matching tag rule, and the level checks out
 		# tag is valid
 		valid = (not badOrder) and ((level, tag) in tagRules)
-	
+
 	return (valid, level, tag, args)
 
 
@@ -130,7 +130,7 @@ def parseText(database, gedText):
 		level = -1
 		newTag = None
 		args = None
-		
+
 		(valid, level, newTag, args) = parseLine(line)
 
 		# Make sure this line is valid before we do anything
@@ -143,7 +143,7 @@ def parseText(database, gedText):
 				if (lastName != None):
 
 					noErrors = db.addIndividual(database, indID, firstName, lastName, gender, birth, death) and noErrors
-					
+
 					indID = None
 					lastName = None
 					firstName = None
@@ -153,7 +153,7 @@ def parseText(database, gedText):
 
 				# Add a family to the database
 				elif (husband != None):
-					
+
 					noErrors  = db.addFamily(database, famID, married, divorced, husband, wife) and noErrors
 
 					for child in children:
@@ -194,8 +194,8 @@ def parseText(database, gedText):
 
 			# Keep track of the tag before this one for birth and death dates
 			lastTag = newTag
-	
-	return noErrors
+
+	return noErrors and db.validateDatabase(database)
 
 
 

@@ -51,25 +51,27 @@ def dbInit(dbName):
 def addIndividual (conn, idStr, firstName, lastName, gender, birth, death):
 
 	if conn is None:
-		print("Can't add individual, bad database paramter")
+		print("ERROR: INDIVIDUAL: Can't add individual, bad database paramter")
 		return False
 	if idStr is None:
-		print("Can't add individual, bad ID tag")
+		print("ERROR: INDIVIDUAL: Can't add individual, missing indiviudal ID")
 		return False
 	if firstName is None:
-		print("Can't add individual " + idStr + ", no first name")
+		print("ERROR: INDIVIDUAL: Can't add individual " + idStr + ", no first name")
 		return False
 	if lastName is None:
-		print("Can't add individual " + idStr + ", no last name")
+		print("ERROR: INDIVIDUAL: Can't add individual " + idStr + ", no last name")
 		return False
 	if gender is None:
-		print("Can't add individual " + idStr + ", no gender")
+		print("ERROR: INDIVIDUAL: Can't add individual " + idStr + ", gender missing gender")
 		return False
 	if gender.lower() != 'm' and gender.lower() != 'f':
-		print("Can't add individual " + idStr + ", bad gender tag")
+		print("ERROR: INDIVIDUAL: Can't add individual " + idStr + ", bad gender tag")
+		return False
 	if birth is None:
-		print("Can't add individual " + idStr + ", no birthday")
-	
+		print("ERROR: INDIVIDUAL: Can't add individual " + idStr + ", no birthday")
+		return False
+
 	try:
 		conn.cursor().execute(
 			'INSERT INTO individuals VALUES (?, ?, ?, ?, ?, ?)',
@@ -89,6 +91,22 @@ def addIndividual (conn, idStr, firstName, lastName, gender, birth, death):
 # Prints error and returns false if invalid
 def addFamily (conn, idStr, married, divorced, husbID, wifeID):
 
+	if conn is None:
+		print("ERROR: FAMILY: Can't add Family, bad database paramter")
+		return False
+	if idStr is None:
+ 		print("ERROR: FAMILY: Can't add Family, family ID missing")
+ 		return False
+	if married is None:
+ 		print("ERROR: FAMILY: Can't add Family, no marriage date")
+ 		return False
+	if husbID is None:
+ 		print("ERROR: FAMILY: Can't add Family, no individual ID for husband.")
+ 		return False
+	if wifeID is None:
+ 		print("ERROR: FAMILY: Can't add Family, no individual ID for wife.")
+ 		return False
+
 	try:
 		conn.cursor().execute(
 			'INSERT INTO families VALUES (?, ?, ?, ?, ?)',
@@ -98,22 +116,8 @@ def addFamily (conn, idStr, married, divorced, husbID, wifeID):
 	except sqlite3.IntegrityError as err:
 		print("Couldn't add family " + str(idStr) + ": " + str(err))
 		return False
-	
-	conn.commit()
-	
-	impossibleSpouses = [row[0] for row in conn.cursor().execute('''
-		SELECT individuals.id
-		FROM
-			individuals INNER JOIN families
-			ON (individuals.id=families.husbID OR individuals.id=families.wifeID)
-		WHERE families.id = ? AND individuals.birth >= families.married''',
-		(idStr,)
-	).fetchall()]
 
-	if (len(impossibleSpouses) > 0):
-		for s in impossibleSpouses:
-			print("Individual " + s + " was born on or before his wedding day")
-		return False
+	conn.commit()
 
 	return True
 
@@ -122,6 +126,16 @@ def addFamily (conn, idStr, married, divorced, husbID, wifeID):
 # Add a child t a family (family must already exist)
 # Prints error and returns false if invalid
 def addChild (conn, childID, famID):
+
+	if conn is None:
+		print("ERROR: CHILD: Can't add Child, bad database paramter")
+		return False
+	if childID is None:
+		print("ERROR: CHILD: Can't add Child, missing Child ID")
+		return False
+	if famID is None:
+		print("ERROR: CHILD: Can't add Child, missing Family ID")
+		return False
 
 	try:
 		conn.cursor().execute(
@@ -181,7 +195,33 @@ def getChildren(conn, famID):
 
 def validateDatabase(conn):
 
-	
+	#US02
+	impossibleSpouses = [row[0] for row in conn.cursor().execute('''
+		SELECT individuals.id
+		FROM
+			individuals INNER JOIN families
+			ON (individuals.id=families.husbID) OR (individuals.id=families.wifeID)
+		WHERE individuals.birth >= families.married'''
+	).fetchall()]
+
+	if (len(impossibleSpouses) > 0):
+		for s in impossibleSpouses:
+			print("ERROR(US02 Birth Before Marriage): Individual " + s + " was born on or before his/her wedding day")
+		return False
+
+	print(str(impossibleSpouses))
+
+	#US04
+	futuremarriage = [row[0] for row in conn.cursor().execute('''
+		SELECT families.id
+		FROM families
+		WHERE (families.divorced NOT NULL) AND (families.divorced <= families.married) '''
+	).fetchall()]
+
+	if (len(futuremarriage) > 0):
+		for s in futuremarriage:
+			print("ERROR(US04 Marriage Before Divorce): Family " + s + " was divorced before their marriage")
+		return False
 
 	#CONSTRAINT birth_before_now CHECK (birth < DATE('now')),
 	#CONSTRAINT death_before_now CHECK (death IS NULL OR death < DATE('now')),
