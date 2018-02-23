@@ -17,45 +17,29 @@ def dbInit(dbName):
 
 	# Individuals table
 	curs.execute('''CREATE TABLE individuals (
-		id 			TEXT	NOT NULL	PRIMARY KEY,
-		firstName	TEXT	NOT NULL,
-		lastName 	TEXT	NOT NULL,
-		gender 		TEXT	NOT NULL,
-		birth 		DATE	NOT NULL,
-		death 		DATE,
-
-		CONSTRAINT gender_m_or_f CHECK (gender in ("M", "F", "m", "f")),
-
-		CONSTRAINT birth_before_now CHECK (birth < DATE('now')),
-		CONSTRAINT death_before_now CHECK (death IS NULL OR death < DATE('now')),
-		CONSTRAINT birth_before_death CHECK (death IS NULL OR birth < death)
+		id 			TEXT	PRIMARY KEY,
+		firstName	TEXT,
+		lastName 	TEXT,
+		gender 		TEXT,
+		birth 		DATE,
+		death 		DATE
 	)''')
 
 	# Families table
 	curs.execute('''CREATE TABLE families (
-		id 			TEXT	NOT NULL	PRIMARY KEY,
-		married		DATE	NOT NULL,
+		id 			TEXT	PRIMARY KEY,
+		married		DATE,
 		divorced 	DATE,
-		husbID 		TEXT	NOT NULL,
-		wifeID 		TEXT	NOT NULL,
-
-		CONSTRAINT husband_exists	FOREIGN KEY (husbID) REFERENCES individuals(id),
-		CONSTRAINT wife_exists		FOREIGN KEY (wifeID) REFERENCES individuals(id),
-
-		CONSTRAINT married_before_now  CHECK (married < DATE('now')),
-		CONSTRAINT divorced_before_now CHECK (divorced IS NULL OR divorced < DATE('now')),
-		CONSTRAINT married_before_divorce CHECK (divorced IS NULL OR married < divorced)
+		husbID 		TEXT,
+		wifeID 		TEXT
 	)''')
 
 	# Children table (associates individuals with a family as a child
 	curs.execute('''CREATE TABLE children (
-		childID		TEXT	NOT NULL,
-		famID		TEXT	NOT NULL,
+		childID		TEXT,
+		famID		TEXT,
 
-		PRIMARY KEY (childID, famID),
-
-		FOREIGN KEY (childID) REFERENCES individuals(id),
-		FOREIGN KEY (famID) REFERENCES families(id)
+		PRIMARY KEY (childID, famID)
 	)''')
 
 	conn.commit()
@@ -66,6 +50,26 @@ def dbInit(dbName):
 # Prints error and returns false if invalid
 def addIndividual (conn, idStr, firstName, lastName, gender, birth, death):
 
+	if conn is None:
+		print("Can't add individual, bad database paramter")
+		return False
+	if idStr is None:
+		print("Can't add individual, bad ID tag")
+		return False
+	if firstName is None:
+		print("Can't add individual " + idStr + ", no first name")
+		return False
+	if lastName is None:
+		print("Can't add individual " + idStr + ", no last name")
+		return False
+	if gender is None:
+		print("Can't add individual " + idStr + ", no gender")
+		return False
+	if gender.lower() != 'm' and gender.lower() != 'f':
+		print("Can't add individual " + idStr + ", bad gender tag")
+	if birth is None:
+		print("Can't add individual " + idStr + ", no birthday")
+	
 	try:
 		conn.cursor().execute(
 			'INSERT INTO individuals VALUES (?, ?, ?, ?, ?, ?)',
@@ -174,3 +178,22 @@ def getChildren(conn, famID):
 		'SELECT childID FROM CHILDREN WHERE famID=?',
 		(famID,)
 	).fetchall()
+
+def validateDatabase(conn):
+
+	
+
+	#CONSTRAINT birth_before_now CHECK (birth < DATE('now')),
+	#CONSTRAINT death_before_now CHECK (death IS NULL OR death < DATE('now')),
+	#CONSTRAINT birth_before_death CHECK (death IS NULL OR birth < death)
+	#CONSTRAINT husband_exists	FOREIGN KEY (husbID) REFERENCES individuals(id),
+	#CONSTRAINT wife_exists		FOREIGN KEY (wifeID) REFERENCES individuals(id),
+
+	#CONSTRAINT married_before_now  CHECK (married < DATE('now')),
+	#CONSTRAINT divorced_before_now CHECK (divorced IS NULL OR divorced < DATE('now')),
+	#CONSTRAINT married_before_divorce CHECK (divorced IS NULL OR married < divorced)
+
+	#FOREIGN KEY (childID) REFERENCES individuals(id),
+	#FOREIGN KEY (famID) REFERENCES families(id)
+
+	return True;
