@@ -111,7 +111,6 @@ def addFamily (conn, idStr, married, divorced, husbID, wifeID):
 		return False
 	if (getIndividual(conn, husbID) is None):
 		print("ERROR: FAMILY: Can't add Family, husband does not exist")
-		return False
 
 	try:
 		conn.cursor().execute(
@@ -201,7 +200,7 @@ def getChildren(conn, famID):
 
 def validateDatabase(conn):
 
-	#US02
+	#US02 - birth before marriage
 	impossibleSpouses = [row[0] for row in conn.cursor().execute('''
 		SELECT individuals.id
 		FROM
@@ -212,10 +211,22 @@ def validateDatabase(conn):
 
 	if (len(impossibleSpouses) > 0):
 		for s in impossibleSpouses:
-			print("ERROR(US02 Birth Before Marriage): Individual " + s + " was born on or before his/her wedding day")
+			print("ERROR(US02 Birth Before Marriage): Individual " + s + " was born on or before his/her wedding day.")
 		return False
 
-	#US04
+	#US03 - death before birth
+	futurebirth = [row[0] for row in conn.cursor().execute('''
+		SELECT individuals.id
+		FROM individuals
+		WHERE (individuals.death NOT NULL) AND (individuals.birth > individuals.death) '''
+	).fetchall()]
+
+	if (len(futurebirth) > 0):
+		for s in futurebirth:
+			print("ERROR(US03 Marriage Before Divorce): Individual " + s + " is born after their death.")
+		return False
+
+	#US04 - marriage before divorce
 	futuremarriage = [row[0] for row in conn.cursor().execute('''
 		SELECT families.id
 		FROM families
@@ -240,4 +251,4 @@ def validateDatabase(conn):
 	#FOREIGN KEY (childID) REFERENCES individuals(id),
 	#FOREIGN KEY (famID) REFERENCES families(id)
 
-	return True
+	return True;
