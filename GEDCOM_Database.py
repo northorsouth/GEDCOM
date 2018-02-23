@@ -203,6 +203,7 @@ def getChildren(conn, famID):
 def validateDatabase(conn):
 
 	#US01 - dates before current date
+	# future births
 	futurebirths = [
 		indi[0] for indi in
 		filter(
@@ -213,9 +214,10 @@ def validateDatabase(conn):
 
 	if (len(futurebirths) > 0):
 		for s in futurebirths:
-			print("ERROR(US01 Dates Before Current Date): Individual " + s + " was born after today.")
+			print("ERROR: US01: Dates Before Current Date: Individual " + s + " was born after today.")
 		return False
-	
+
+	# future deaths
 	futuredeaths = [
 		indi[0] for indi in
 		filter(
@@ -226,9 +228,10 @@ def validateDatabase(conn):
 
 	if (len(futuredeaths) > 0):
 		for s in futuredeaths:
-			print("ERROR(US01 Dates Before Current Date): Individual " + s + " died after today.")
+			print("ERROR: US01: Dates Before Current Date: Individual " + s + " died after today.")
 		return False
-	
+
+	# future marriages
 	furturemarriages = [
 		fam[0] for fam in
 		filter(
@@ -239,9 +242,10 @@ def validateDatabase(conn):
 
 	if (len(furturemarriages) > 0):
 		for s in furturemarriages:
-			print("ERROR(US01 Dates Before Current Date): Family " + s + " was married after today.")
+			print("ERROR: US01 Dates Before Current Date: Family " + s + " was married after today.")
 		return False
-	
+
+	#future divorces
 	futuredivorces = [
 		fam[0] for fam in
 		filter(
@@ -252,9 +256,9 @@ def validateDatabase(conn):
 
 	if (len(futuredivorces) > 0):
 		for s in futuredivorces:
-			print("ERROR(US01 Dates Before Current Date): Family " + s + " was divorced after today.")
+			print("ERROR: US01: Dates Before Current Date: Family " + s + " was divorced after today.")
 		return False
-	
+
 	#US02 - birth before marriage
 	impossibleSpouses = [row[0] for row in conn.cursor().execute('''
 		SELECT individuals.id
@@ -266,7 +270,7 @@ def validateDatabase(conn):
 
 	if (len(impossibleSpouses) > 0):
 		for s in impossibleSpouses:
-			print("ERROR(US02 Birth Before Marriage): Individual " + s + " was born on or before his/her wedding day.")
+			print("ERROR: US02: Birth Before Marriage: Individual " + s + " was born on or before his/her wedding day.")
 		return False
 
 	#US03 - death before birth
@@ -278,7 +282,7 @@ def validateDatabase(conn):
 
 	if (len(backwardsbirths) > 0):
 		for s in backwardsbirths:
-			print("ERROR(US03 Marriage Before Divorce): Individual " + s + " is born after their death.")
+			print("ERROR: US03: Marriage Before Divorce: Individual " + s + " is born after their death.")
 		return False
 
 	#US04 - marriage before divorce
@@ -290,20 +294,7 @@ def validateDatabase(conn):
 
 	if (len(futuremarriage) > 0):
 		for s in futuremarriage:
-			print("ERROR(US04 Marriage Before Divorce): Family " + s + " was divorced before their marriage")
+			print("ERROR: US04: Marriage Before Divorce: Family " + s + " was divorced before their marriage")
 		return False
 
-	#CONSTRAINT birth_before_now CHECK (birth < DATE('now')),
-	#CONSTRAINT death_before_now CHECK (death IS NULL OR death < DATE('now')),
-	#CONSTRAINT birth_before_death CHECK (death IS NULL OR birth < death)
-	#CONSTRAINT husband_exists	FOREIGN KEY (husbID) REFERENCES individuals(id),
-	#CONSTRAINT wife_exists		FOREIGN KEY (wifeID) REFERENCES individuals(id),
-
-	#CONSTRAINT married_before_now  CHECK (married < DATE('now')),
-	#CONSTRAINT divorced_before_now CHECK (divorced IS NULL OR divorced < DATE('now')),
-	#CONSTRAINT married_before_divorce CHECK (divorced IS NULL OR married < divorced)
-
-	#FOREIGN KEY (childID) REFERENCES individuals(id),
-	#FOREIGN KEY (famID) REFERENCES families(id)
-
-	return True;
+	return True
