@@ -106,6 +106,12 @@ def addFamily (conn, idStr, married, divorced, husbID, wifeID):
 	if wifeID is None:
  		print("ERROR: FAMILY: Can't add Family, no individual ID for wife.")
  		return False
+	if (getIndividual(conn, wifeID) is None):
+		print("ERROR: FAMILY: Can't add Family, wife does not exist")
+		return False
+	if (getIndividual(conn, husbID) is None):
+		print("ERROR: FAMILY: Can't add Family, husband does not exist")
+		return False
 
 	try:
 		conn.cursor().execute(
