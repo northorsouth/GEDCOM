@@ -202,6 +202,8 @@ def getChildren(conn, famID):
 
 def validateDatabase(conn):
 
+	noerrors = True
+
 	#US01 - dates before current date
 	# future births
 	futurebirths = [
@@ -215,7 +217,7 @@ def validateDatabase(conn):
 	if (len(futurebirths) > 0):
 		for s in futurebirths:
 			print("ERROR: US01: Dates Before Current Date: Individual " + s + " was born after today.")
-		return False
+		noerrors = False
 
 	# future deaths
 	futuredeaths = [
@@ -229,7 +231,7 @@ def validateDatabase(conn):
 	if (len(futuredeaths) > 0):
 		for s in futuredeaths:
 			print("ERROR: US01: Dates Before Current Date: Individual " + s + " died after today.")
-		return False
+		noerrors = False
 
 	# future marriages
 	furturemarriages = [
@@ -243,7 +245,7 @@ def validateDatabase(conn):
 	if (len(furturemarriages) > 0):
 		for s in furturemarriages:
 			print("ERROR: US01 Dates Before Current Date: Family " + s + " was married after today.")
-		return False
+		noerrors = False
 
 	#future divorces
 	futuredivorces = [
@@ -257,7 +259,7 @@ def validateDatabase(conn):
 	if (len(futuredivorces) > 0):
 		for s in futuredivorces:
 			print("ERROR: US01: Dates Before Current Date: Family " + s + " was divorced after today.")
-		return False
+		noerrors = False
 
 	#US02 - birth before marriage
 	impossibleSpouses = [row[0] for row in conn.cursor().execute('''
@@ -271,7 +273,7 @@ def validateDatabase(conn):
 	if (len(impossibleSpouses) > 0):
 		for s in impossibleSpouses:
 			print("ERROR: US02: Birth Before Marriage: Individual " + s + " was born on or before his/her wedding day.")
-		return False
+		noerrors = False
 
 	#US03 - death before birth
 	backwardsbirths = [row[0] for row in conn.cursor().execute('''
@@ -282,8 +284,8 @@ def validateDatabase(conn):
 
 	if (len(backwardsbirths) > 0):
 		for s in backwardsbirths:
-			print("ERROR: US03: Marriage Before Divorce: Individual " + s + " is born after their death.")
-		return False
+			print("ERROR: US03: Death before Birth: Individual " + s + " is born after their death.")
+		noerrors = False
 
 	#US04 - marriage before divorce
 	futuremarriage = [row[0] for row in conn.cursor().execute('''
@@ -295,6 +297,6 @@ def validateDatabase(conn):
 	if (len(futuremarriage) > 0):
 		for s in futuremarriage:
 			print("ERROR: US04: Marriage Before Divorce: Family " + s + " was divorced before their marriage")
-		return False
+		noerrors = False
 
-	return True
+	return noerrors
