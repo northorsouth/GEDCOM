@@ -275,5 +275,9 @@ class datesTest(unittest.TestCase):
     #validates that a marriage is before a death (US05)
     def test_marrBFORdeath(self):
         self.assertFalse(parser.parseFile(self.database, "input/US05test.ged"))
+    
+    #validates that no children have a different last name than their father (US16)
+    def test_maleLastNames(self):
+        self.assertFalse(parser.parseFile(self.database, "input/US16test.ged"))
 
 unittest.main()
