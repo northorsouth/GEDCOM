@@ -298,7 +298,7 @@ def validateDatabase(conn):
 		for s in futuremarriage:
 			print("ERROR: US04: Marriage Before Divorce: Family " + s + " was divorced before their marriage")
 		noerrors = False
-	
+
 	#US05 - marriage before death
 	corpsebrides = [row[0] for row in conn.cursor().execute('''
 		SELECT individuals.id
@@ -311,6 +311,24 @@ def validateDatabase(conn):
 	if (len(corpsebrides) > 0):
 		for s in corpsebrides:
 			print("ERROR: US05: Marriage Before Death: Individual " + s + " was married after their death")
+		noerrors = False
+
+	#US16 - male last names
+	bastards = [row[0] for row in conn.cursor().execute('''
+		SELECT i1.id
+		FROM
+			individuals AS i1 INNER JOIN children AS c
+			ON (i1.ID = c.childID)
+			INNER JOIN familes AS f
+			ON (c.famID = f.id)
+			INNER JOIN individuals AS i2
+			ON (f.husbID = i2.id)
+		WHERE i1.sex == M AND i2.lastName != i1.lastName'''
+	).fetchall()]
+
+	if (len(bastards) > 0):
+		for s in bastards:
+			print("ANAOMALY: US16: Male Last Names: Individual " + s + " does not have the same last name as their father.")
 		noerrors = False
 
 	return noerrors
