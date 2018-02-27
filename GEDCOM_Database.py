@@ -99,19 +99,19 @@ def addFamily (conn, idStr, married, divorced, husbID, wifeID):
  		print("ERROR: FAMILY: Can't add Family, family ID missing")
  		return False
 	if married is None:
- 		print("ERROR: FAMILY: Can't add Family, no marriage date")
+ 		print("ERROR: FAMILY: Can't add Family " + idStr + ", no marriage date")
  		return False
 	if husbID is None:
- 		print("ERROR: FAMILY: Can't add Family, no individual ID for husband.")
+ 		print("ERROR: FAMILY: Can't add Family " + idStr + ", no individual ID for husband.")
  		return False
 	if wifeID is None:
- 		print("ERROR: FAMILY: Can't add Family, no individual ID for wife.")
+ 		print("ERROR: FAMILY: Can't add Family " + idStr + ", no individual ID for wife.")
  		return False
 	if (getIndividual(conn, wifeID) is None):
-		print("ERROR: FAMILY: Can't add Family, wife does not exist")
+		print("ERROR: FAMILY: Can't add Family " + idStr + ", wife does not exist")
 		return False
 	if (getIndividual(conn, husbID) is None):
-		print("ERROR: FAMILY: Can't add Family, husband does not exist")
+		print("ERROR: FAMILY: Can't add Family " + idStr + ", husband does not exist")
 		return False
 
 	try:
