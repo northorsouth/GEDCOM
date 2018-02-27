@@ -1,7 +1,7 @@
 0 NOTE this is a test file for US21 correct gender for roll
 0 I01 INDI
 1 NAME Richard /Johnson/
-1 SEX M
+1 SEX F
 1 BIRT
 2 DATE 2 FEB 1939
 1 DEAT
@@ -10,7 +10,7 @@
 0 NOTE end of Richard Johnson
 0 I02 INDI
 1 NAME Sally /Smith/
-1 SEX F
+1 SEX M
 1 BIRT
 2 DATE 11 NOV 1942
 1 DEAT
