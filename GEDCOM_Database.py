@@ -298,5 +298,19 @@ def validateDatabase(conn):
 		for s in futuremarriage:
 			print("ERROR: US04: Marriage Before Divorce: Family " + s + " was divorced before their marriage")
 		noerrors = False
+	
+	#US05 - marriage before death
+	corpsebrides = [row[0] for row in conn.cursor().execute('''
+		SELECT individuals.id
+		FROM
+			individuals INNER JOIN families
+			ON (individuals.id=families.husbID) OR (individuals.id=families.wifeID)
+		WHERE families.married > individuals.death'''
+	).fetchall()]
+
+	if (len(corpsebrides) > 0):
+		for s in corpsebrides:
+			print("ERROR: US05: Marriage Before Death: Individual " + s + " was married after their death")
+		noerrors = False
 
 	return noerrors
