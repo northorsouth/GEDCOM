@@ -216,7 +216,7 @@ def validateDatabase(conn):
 
 	if (len(futurebirths) > 0):
 		for s in futurebirths:
-			print("ERROR: US01: Dates Before Current Date: Individual " + s + " was born after today.")
+			print("ANOMALY: US01: Dates Before Current Date: Individual " + s + " was born after today.")
 		noerrors = False
 
 	# future deaths
@@ -230,7 +230,7 @@ def validateDatabase(conn):
 
 	if (len(futuredeaths) > 0):
 		for s in futuredeaths:
-			print("ERROR: US01: Dates Before Current Date: Individual " + s + " died after today.")
+			print("ANOMALY: US01: Dates Before Current Date: Individual " + s + " died after today.")
 		noerrors = False
 
 	# future marriages
@@ -244,7 +244,7 @@ def validateDatabase(conn):
 
 	if (len(furturemarriages) > 0):
 		for s in furturemarriages:
-			print("ERROR: US01 Dates Before Current Date: Family " + s + " was married after today.")
+			print("ANOMALY: US01 Dates Before Current Date: Family " + s + " was married after today.")
 		noerrors = False
 
 	#future divorces
@@ -258,7 +258,7 @@ def validateDatabase(conn):
 
 	if (len(futuredivorces) > 0):
 		for s in futuredivorces:
-			print("ERROR: US01: Dates Before Current Date: Family " + s + " was divorced after today.")
+			print("ANOMALY: US01: Dates Before Current Date: Family " + s + " was divorced after today.")
 		noerrors = False
 
 	#US02 - birth before marriage
@@ -272,7 +272,7 @@ def validateDatabase(conn):
 
 	if (len(impossibleSpouses) > 0):
 		for s in impossibleSpouses:
-			print("ERROR: US02: Birth Before Marriage: Individual " + s + " was born on or before his/her wedding day.")
+			print("ANOMALY: US02: Birth Before Marriage: Individual " + s + " was born on or before his/her wedding day.")
 		noerrors = False
 
 	#US03 - death before birth
@@ -284,7 +284,7 @@ def validateDatabase(conn):
 
 	if (len(backwardsbirths) > 0):
 		for s in backwardsbirths:
-			print("ERROR: US03: Death before Birth: Individual " + s + " is born after their death.")
+			print("ANOMALY: US03: Death before Birth: Individual " + s + " is born after their death.")
 		noerrors = False
 
 	#US04 - marriage before divorce
@@ -296,7 +296,7 @@ def validateDatabase(conn):
 
 	if (len(futuremarriage) > 0):
 		for s in futuremarriage:
-			print("ERROR: US04: Marriage Before Divorce: Family " + s + " was divorced before their marriage")
+			print("ANOMALY: US04: Marriage Before Divorce: Family " + s + " was divorced before their marriage")
 		noerrors = False
 
 	#US05 - marriage before death
@@ -310,7 +310,7 @@ def validateDatabase(conn):
 
 	if (len(corpsebrides) > 0):
 		for s in corpsebrides:
-			print("ERROR: US05: Marriage Before Death: Individual " + s + " was married after their death")
+			print("ANOMALY: US05: Marriage Before Death: Individual " + s + " was married after their death")
 		noerrors = False
 
 	#US16 - male last names
@@ -319,16 +319,16 @@ def validateDatabase(conn):
 		FROM
 			individuals AS i1 INNER JOIN children AS c
 			ON (i1.ID = c.childID)
-			INNER JOIN familes AS f
+			INNER JOIN families AS f
 			ON (c.famID = f.id)
 			INNER JOIN individuals AS i2
 			ON (f.husbID = i2.id)
-		WHERE i1.sex == M AND i2.lastName != i1.lastName'''
+		WHERE i1.gender == "M" AND i2.lastName != i1.lastName'''
 	).fetchall()]
 
 	if (len(bastards) > 0):
 		for s in bastards:
-			print("ANAOMALY: US16: Male Last Names: Individual " + s + " does not have the same last name as their father.")
+			print("ANOMALY: US16: Male Last Names: Individual " + s + " does not have the same last name as their father.")
 		noerrors = False
 
 	return noerrors
