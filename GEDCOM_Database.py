@@ -330,5 +330,22 @@ def validateDatabase(conn):
 		for s in bastards:
 			print("ANOMALY: US16: Male Last Names: Individual " + s + " does not have the same last name as their father.")
 		noerrors = False
+	
+	#US18 - siblings should not marry
+	incest = [row[0] for row in conn.cursor().execute('''
+		SELECT f.id
+		FROM
+			families as f
+			INNER JOIN children as husbFam
+			ON f.husbID == husbFam.childID
+			INNER JOIN children as wifeFam
+			ON f.wifeID == wifeFam.childID
+		WHERE husbFam.famID == wifeFam.famID'''
+	).fetchall()]
+
+	if (len(incest) > 0):
+		for s in incest:
+			print("ANOMALY: US18: Siblings should not marry: The spouses in family " + s + " are siblings.")
+		noerrors = False
 
 	return noerrors
