@@ -168,7 +168,7 @@ class datesTest(unittest.TestCase):
         self.assertTrue(parser.parseText(self.database, goodGuy))
 
         self.assertFalse(parser.parseText(self.database, fam1))
-    
+
     # Validates that the spouses must already exist for a family to be created
     def test_spousesExist_2(self):
         goodGirl = '''
@@ -278,7 +278,10 @@ class datesTest(unittest.TestCase):
 
     # validates that a couple was married before they got divorced
     def test_marrBFORdiv(self):
-
         self.assertFalse(parser.parseFile(self.database, "input/US04test.ged"))
+
+    #validates that a marriage is before a death (US05)
+    def test_marrBFORdeath(self):
+        self.assertFalse(parser.parseFile(self.database, "input/US05test.ged"))
 
 unittest.main()
