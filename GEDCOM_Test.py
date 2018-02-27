@@ -25,7 +25,7 @@ class datesTest(unittest.TestCase):
 
         parser.printDatabase(self.database)
 
-    # validates all dates are before the current date
+    # validates birthdays are before the current date
     def test_dateBFORcurrent_1(self):
 
         badBday = '''
@@ -39,7 +39,7 @@ class datesTest(unittest.TestCase):
 
         self.assertFalse(parser.parseText(self.database, badBday))
 
-    # validates all dates are before the current date
+    # validates death dates are before the current date
     def test_dateBFORcurrent_2(self):
 
         badDday = '''
@@ -55,7 +55,7 @@ class datesTest(unittest.TestCase):
 
         self.assertFalse(parser.parseText(self.database, badDday))
 
-    # validates all dates are before the current date
+    # validates all marriages are before the current date
     def test_dateBFORcurrent_3(self):
 
         goodGuy = '''
@@ -64,8 +64,6 @@ class datesTest(unittest.TestCase):
             1 SEX M
             1 BIRT
             2 DATE 25 APR 1919
-            1 DEAT
-            2 DATE 13 SEP 1939
             1 FAMS @F1@
             0 TRLR
         '''
@@ -76,8 +74,6 @@ class datesTest(unittest.TestCase):
             1 SEX F
             1 BIRT
             2 DATE 25 APR 1920
-            1 DEAT
-            2 DATE 13 SEP 1940
             1 FAMS @F1@
             0 TRLR
         '''
@@ -97,7 +93,7 @@ class datesTest(unittest.TestCase):
 
         self.assertFalse(parser.parseText(self.database, badMar))
 
-    # validates all dates are before the current date
+    # validates all divorce dates are before the current date
     def test_dateBFORcurrent_4(self):
 
         goodGuy = '''
@@ -106,8 +102,6 @@ class datesTest(unittest.TestCase):
             1 SEX M
             1 BIRT
             2 DATE 25 APR 1919
-            1 DEAT
-            2 DATE 13 SEP 1939
             1 FAMS @F1@
             0 TRLR
         '''
@@ -118,8 +112,6 @@ class datesTest(unittest.TestCase):
             1 SEX F
             1 BIRT
             2 DATE 25 APR 1920
-            1 DEAT
-            2 DATE 13 SEP 1940
             1 FAMS @F1@
             0 TRLR
         '''
@@ -205,7 +197,7 @@ class datesTest(unittest.TestCase):
             1 NAME Woody /Allen/
             1 SEX M
             1 BIRT
-            2 DATE 25 APR 1920
+            2 DATE 25 APR 192
             1 FAMS @F1@
             0 TRLR
             '''
