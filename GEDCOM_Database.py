@@ -330,7 +330,7 @@ def validateDatabase(conn):
 		for s in bastards:
 			print("ANOMALY: US16: Male Last Names: Individual " + s + " does not have the same last name as their father.")
 		noerrors = False
-	
+
 	#US18 - siblings should not marry
 	incest = [row[0] for row in conn.cursor().execute('''
 		SELECT f.id
@@ -346,6 +346,20 @@ def validateDatabase(conn):
 	if (len(incest) > 0):
 		for s in incest:
 			print("ANOMALY: US18: Siblings should not marry: The spouses in family " + s + " are siblings.")
+		noerrors = False
+
+	#US21 - correct gender for roll
+	roleswap = [row[0] for row in conn.cursor().execute('''
+		SELECT individuals.id
+		FROM
+			individuals INNER JOIN families
+			ON (individuals.id == families.husbID AND individuals.gender == "F")
+			OR (individuals.id == families.wifeID AND individuals.gender == "M")'''
+	).fetchall()]
+
+	if (len(roleswap) > 0):
+		for s in roleswap:
+			print("ANOMALY: US21: Correct Gender For Role: Individual " + s + " has the wrong gender for their family role.")
 		noerrors = False
 
 	return noerrors
