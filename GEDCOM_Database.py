@@ -1,6 +1,7 @@
 import sqlite3
 from datetime import datetime
 import os
+import string
 
 # Call this function to initialize the database tables
 def dbInit(dbName):
@@ -200,121 +201,120 @@ def getChildren(conn, famID):
 		(famID,)
 	).fetchall()
 
+# Apply a given SQL query to the database that should return a list of anomolies
+# Print out the given error message for each row returned
+# The error message should be a valid format string with flags for each column of the SQL query
+# returns true if there are no anomolies, or false if there are
+def checkAnomoly (conn, sql, msg):
+
+	anomolies = conn.cursor().execute(sql).fetchall()
+	formatter = string.Formatter()
+
+	for a in anomolies:
+		print(formatter.vformat(msg, a, None))
+	
+	return len(anomolies) == 0
+
 def validateDatabase(conn):
 
 	noerrors = True
 
 	#US01 - dates before current date
 	# future births
-	futurebirths = [
-		indi[0] for indi in
-		filter(
-			lambda indi: indi[4] > str(datetime.now()),
-			getIndividuals(conn)
-		)
-	]
-
-	if (len(futurebirths) > 0):
-		for s in futurebirths:
-			print("ANOMALY: US01: Dates Before Current Date: Individual " + s + " was born after today.")
-		noerrors = False
-
-	# future deaths
-	futuredeaths = [
-		indi[0] for indi in
-		filter(
-			lambda indi: indi[5] != None and indi[5] > str(datetime.now()),
-			getIndividuals(conn)
-		)
-	]
-
-	if (len(futuredeaths) > 0):
-		for s in futuredeaths:
-			print("ANOMALY: US01: Dates Before Current Date: Individual " + s + " died after today.")
-		noerrors = False
-
-	# future marriages
-	furturemarriages = [
-		fam[0] for fam in
-		filter(
-			lambda fam: fam[1] > str(datetime.now()),
-			getFamilies(conn)
-		)
-	]
-
-	if (len(furturemarriages) > 0):
-		for s in furturemarriages:
-			print("ANOMALY: US01 Dates Before Current Date: Family " + s + " was married after today.")
-		noerrors = False
-
-	#future divorces
-	futuredivorces = [
-		fam[0] for fam in
-		filter(
-			lambda fam: fam[2] != None and fam[2] > str(datetime.now()),
-			getFamilies(conn)
-		)
-	]
-
-	if (len(futuredivorces) > 0):
-		for s in futuredivorces:
-			print("ANOMALY: US01: Dates Before Current Date: Family " + s + " was divorced after today.")
-		noerrors = False
-
-	#US02 - birth before marriage
-	impossibleSpouses = [row[0] for row in conn.cursor().execute('''
-		SELECT individuals.id
-		FROM
-			individuals INNER JOIN families
-			ON (individuals.id=families.husbID) OR (individuals.id=families.wifeID)
-		WHERE individuals.birth >= families.married'''
-	).fetchall()]
-
-	if (len(impossibleSpouses) > 0):
-		for s in impossibleSpouses:
-			print("ANOMALY: US02: Birth Before Marriage: Individual " + s + " was born on or before his/her wedding day.")
-		noerrors = False
-
-	#US03 - death before birth
-	backwardsbirths = [row[0] for row in conn.cursor().execute('''
+	noerrors &= checkAnomoly(conn,
+		'''
 		SELECT individuals.id
 		FROM individuals
-		WHERE (individuals.death NOT NULL) AND (individuals.birth > individuals.death) '''
-	).fetchall()]
+		WHERE individuals.birth > DATE('now')
+		''',
 
-	if (len(backwardsbirths) > 0):
-		for s in backwardsbirths:
-			print("ANOMALY: US03: Death before Birth: Individual " + s + " is born after their death.")
-		noerrors = False
+		"ANOMALY: US01: Dates Before Current Date: Individual {} was born after today."
+	)
 
-	#US04 - marriage before divorce
-	futuremarriage = [row[0] for row in conn.cursor().execute('''
+	# future deaths
+	noerrors &= checkAnomoly(conn,
+		'''
+		SELECT individuals.id
+		FROM individuals
+		WHERE individuals.death > DATE('now')
+		''',
+
+		"ANOMALY: US01: Dates Before Current Date: Individual {} died after today."
+	)
+
+	# future marriages
+	noerrors &= checkAnomoly(conn,
+		'''
 		SELECT families.id
 		FROM families
-		WHERE (families.divorced NOT NULL) AND (families.divorced <= families.married) '''
-	).fetchall()]
+		WHERE families.married > DATE('now')
+		''',
 
-	if (len(futuremarriage) > 0):
-		for s in futuremarriage:
-			print("ANOMALY: US04: Marriage Before Divorce: Family " + s + " was divorced before their marriage")
-		noerrors = False
+		"ANOMALY: US01 Dates Before Current Date: Family {} was married after today."
+	)
 
-	#US05 - marriage before death
-	corpsebrides = [row[0] for row in conn.cursor().execute('''
+	#future divorces
+	noerrors &= checkAnomoly(conn,
+		'''
+		SELECT families.id
+		FROM families
+		WHERE families.divorced > DATE('now')
+		''',
+
+		"ANOMALY: US01: Dates Before Current Date: Family {} was divorced after today."
+	)
+
+	#US02 - birth before marriage
+	noerrors &= checkAnomoly(conn,
+		'''
 		SELECT individuals.id
 		FROM
 			individuals INNER JOIN families
 			ON (individuals.id=families.husbID) OR (individuals.id=families.wifeID)
-		WHERE families.married > individuals.death'''
-	).fetchall()]
+		WHERE individuals.birth >= families.married
+		''',
+		
+		"ANOMALY: US02: Birth Before Marriage: Individual {} was born on or before his/her wedding day."
+	)
 
-	if (len(corpsebrides) > 0):
-		for s in corpsebrides:
-			print("ANOMALY: US05: Marriage Before Death: Individual " + s + " was married after their death")
-		noerrors = False
+	#US03 - death before birth
+	noerrors &= checkAnomoly(conn,
+		'''
+		SELECT individuals.id
+		FROM individuals
+		WHERE (individuals.death NOT NULL) AND (individuals.birth > individuals.death)
+		''',
+		
+		"ANOMALY: US03: Death before Birth: Individual {} is born after their death."
+	)
+
+	#US04 - marriage before divorce
+	noerrors &= checkAnomoly(conn,
+		'''
+		SELECT families.id
+		FROM families
+		WHERE (families.divorced NOT NULL) AND (families.divorced <= families.married)
+		''',
+		
+		"ANOMALY: US04: Marriage Before Divorce: Family {} was divorced before their marriage"
+	)
+
+	#US05 - marriage before death
+	noerrors &= checkAnomoly(conn,
+		'''
+		SELECT individuals.id
+		FROM
+			individuals INNER JOIN families
+			ON (individuals.id=families.husbID) OR (individuals.id=families.wifeID)
+		WHERE families.married > individuals.death
+		''',
+		
+		"ANOMALY: US05: Marriage Before Death: Individual {} was married after their death"
+	)
 
 	#US16 - male last names
-	bastards = [row[0] for row in conn.cursor().execute('''
+	noerrors &= checkAnomoly(conn,
+		'''
 		SELECT i1.id
 		FROM
 			individuals AS i1 INNER JOIN children AS c
@@ -323,16 +323,15 @@ def validateDatabase(conn):
 			ON (c.famID = f.id)
 			INNER JOIN individuals AS i2
 			ON (f.husbID = i2.id)
-		WHERE i1.gender == "M" AND i2.lastName != i1.lastName'''
-	).fetchall()]
-
-	if (len(bastards) > 0):
-		for s in bastards:
-			print("ANOMALY: US16: Male Last Names: Individual " + s + " does not have the same last name as their father.")
-		noerrors = False
+		WHERE i1.gender == "M" AND i2.lastName != i1.lastName
+		''',
+		
+		"ANOMALY: US16: Male Last Names: Individual {} does not have the same last name as their father."
+	)
 
 	#US18 - siblings should not marry
-	incest = [row[0] for row in conn.cursor().execute('''
+	noerrors &= checkAnomoly(conn,
+		'''
 		SELECT f.id
 		FROM
 			families as f
@@ -340,26 +339,24 @@ def validateDatabase(conn):
 			ON f.husbID == husbFam.childID
 			INNER JOIN children as wifeFam
 			ON f.wifeID == wifeFam.childID
-		WHERE husbFam.famID == wifeFam.famID'''
-	).fetchall()]
+		WHERE husbFam.famID == wifeFam.famID
+		''',
 
-	if (len(incest) > 0):
-		for s in incest:
-			print("ANOMALY: US18: Siblings should not marry: The spouses in family " + s + " are siblings.")
-		noerrors = False
+		"ANOMALY: US18: Siblings should not marry: The spouses in family {} are siblings."
+	)
 
 	#US21 - correct gender for roll
-	roleswap = [row[0] for row in conn.cursor().execute('''
+	noerrors &= checkAnomoly(conn,
+		'''
 		SELECT individuals.id
 		FROM
 			individuals INNER JOIN families
-			ON (individuals.id == families.husbID AND individuals.gender == "F")
-			OR (individuals.id == families.wifeID AND individuals.gender == "M")'''
-	).fetchall()]
+			ON
+				(individuals.id == families.husbID AND individuals.gender == "F") OR
+				(individuals.id == families.wifeID AND individuals.gender == "M")
+		''',
 
-	if (len(roleswap) > 0):
-		for s in roleswap:
-			print("ANOMALY: US21: Correct Gender For Role: Individual " + s + " has the wrong gender for their family role.")
-		noerrors = False
+		"ANOMALY: US21: Correct Gender For Role: Individual {} has the wrong gender for their family role."
+	)
 
 	return noerrors
