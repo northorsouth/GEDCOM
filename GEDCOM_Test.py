@@ -5,8 +5,8 @@
 
 import unittest
 
-import GEDCOM_Database_refactored as db
-import GEDCOM_Parser_refactored as parser
+import GEDCOM_Database as db
+import GEDCOM_Parser as parser
 from prettytable import PrettyTable
 
 #all tests dealing with dates
@@ -215,10 +215,6 @@ class datesTest(unittest.TestCase):
     def test_marrBFORdeath(self):
         self.assertFalse(parser.parseFile(self.database, "input/US05test.ged"))
 
-    # validates that individuals have the correct family role for their Gender
-    def test_roleswap(self):
-        self.assertFalse(parser.parseFile(self.database, "input/US21test.ged"))
-
 #tests all user stories dealing with family relationships
 class familyTest(unittest.TestCase):
 
@@ -305,6 +301,11 @@ class miscTest(unittest.TestCase):
     # validates that individuals have the correct family role for their Gender
     def test_roleswap(self):
         self.assertFalse(parser.parseFile(self.database, "input/US21test.ged"))
+    
+    def test_sunnyday(self):
+        self.assertTrue(parser.parseFile(self.database, "input/project03test.ged"))
+
+        parser.printDatabase(self.database)
 
 
 unittest.main()
