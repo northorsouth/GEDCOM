@@ -306,6 +306,12 @@ class miscTest(unittest.TestCase):
         self.assertTrue(parser.parseFile(self.database, "input/project03test.ged"))
 
         parser.printDatabase(self.database)
+    
+    def test_duplicateIndIDs(self):
+        self.assertFalse(parser.parseFile(self.database, "input/US22test_1.ged"))
+    
+    def test_duplicateFamIDs(self):
+        self.assertFalse(parser.parseFile(self.database, "input/US22test_2.ged"))
 
 
 unittest.main()

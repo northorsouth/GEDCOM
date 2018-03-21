@@ -73,6 +73,8 @@ def addIndividual (conn, idStr, firstName, lastName, gender, birth, death):
 	if birth is None:
 		print("ERROR: INDIVIDUAL: Can't add individual " + idStr + ", no birthday")
 		return False
+	if not (getIndividual(conn, idStr) is None):
+		print("ERROR: INDIVIDUAL: Can't add individual " + idStr + ", duplicate of existing individual ID")
 
 	try:
 		conn.cursor().execute(
@@ -114,6 +116,8 @@ def addFamily (conn, idStr, married, divorced, husbID, wifeID):
 	if (getIndividual(conn, husbID) is None):
 		print("ERROR: FAMILY: Can't add Family " + idStr + ", husband does not exist")
 		return False
+	if not (getFamily(conn, idStr) is None):
+		print("ERROR: FAMILY: Can't add family " + idStr + ", duplicate of existing family ID")
 
 	try:
 		conn.cursor().execute(
