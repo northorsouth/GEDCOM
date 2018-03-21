@@ -75,7 +75,7 @@ def addIndividual (conn, idStr, firstName, lastName, gender, birth, death):
 		return False
 	if not (getIndividual(conn, idStr) is None):
 		print("ERROR: INDIVIDUAL: Can't add individual " + idStr + ", duplicate of existing individual ID")
-
+		return False
 	try:
 		conn.cursor().execute(
 			'INSERT INTO individuals VALUES (?, ?, ?, ?, ?, ?)',
@@ -118,7 +118,7 @@ def addFamily (conn, idStr, married, divorced, husbID, wifeID):
 		return False
 	if not (getFamily(conn, idStr) is None):
 		print("ERROR: FAMILY: Can't add family " + idStr + ", duplicate of existing family ID")
-
+		return False
 	try:
 		conn.cursor().execute(
 			'INSERT INTO families VALUES (?, ?, ?, ?, ?)',
@@ -216,7 +216,7 @@ def checkAnomoly (conn, sql, msg):
 
 	for a in anomolies:
 		print(formatter.vformat(msg, a, None))
-	
+
 	return len(anomolies) == 0
 
 def validateDatabase(conn):
@@ -277,7 +277,7 @@ def validateDatabase(conn):
 			ON (individuals.id=families.husbID) OR (individuals.id=families.wifeID)
 		WHERE individuals.birth >= families.married
 		''',
-		
+
 		"ANOMALY: US02: Birth Before Marriage: Individual {} was born on or before his/her wedding day."
 	)
 
@@ -288,7 +288,7 @@ def validateDatabase(conn):
 		FROM individuals
 		WHERE (individuals.death NOT NULL) AND (individuals.birth > individuals.death)
 		''',
-		
+
 		"ANOMALY: US03: Death before Birth: Individual {} is born after their death."
 	)
 
@@ -299,7 +299,7 @@ def validateDatabase(conn):
 		FROM families
 		WHERE (families.divorced NOT NULL) AND (families.divorced <= families.married)
 		''',
-		
+
 		"ANOMALY: US04: Marriage Before Divorce: Family {} was divorced before their marriage"
 	)
 
@@ -312,7 +312,7 @@ def validateDatabase(conn):
 			ON (individuals.id=families.husbID) OR (individuals.id=families.wifeID)
 		WHERE families.married > individuals.death
 		''',
-		
+
 		"ANOMALY: US05: Marriage Before Death: Individual {} was married after their death"
 	)
 
@@ -329,7 +329,7 @@ def validateDatabase(conn):
 			ON (f.husbID = i2.id)
 		WHERE i1.gender == "M" AND i2.lastName != i1.lastName
 		''',
-		
+
 		"ANOMALY: US16: Male Last Names: Individual {} does not have the same last name as their father."
 	)
 
