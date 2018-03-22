@@ -378,7 +378,7 @@ def generateList(conn):
 		"LIST: US29: List Deceased: Individual {} is no longer alive."
 	)
 
-	#US30 - List living Married **note: widows and widowers will still appear in this list.
+	#US30 - List living Married
 	checkAnomoly(conn,
 		'''
 		SELECT husband.id
@@ -400,4 +400,23 @@ def generateList(conn):
 		''',
 
 		"LIST: US30: List Living Married: Individual {} is married and alive."
+	)
+
+	#US32 - List living Married
+	checkAnomoly(conn,
+		'''
+		SELECT child1.id, child1.birth
+		FROM
+			individuals as child1
+			INNER JOIN individuals as child2
+			ON child1.id != child2.id
+			INNER JOIN children as child1Link ON
+			child1.id == child1Link.childID
+			INNER JOIN children as child2Link ON
+			child2.id == child2Link.childID
+		WHERE
+			child1Link.famID == child2Link.famID AND child1.birth == child2.birth
+		''',
+
+		"LIST: US32: List Multiple Births: Individual {} was part of a multiple birth on {}."
 	)
