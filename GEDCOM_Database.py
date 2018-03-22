@@ -364,3 +364,40 @@ def validateDatabase(conn):
 	)
 
 	return noerrors
+
+def generateList(conn):
+
+	#US29 - Unique IDs
+	checkAnomoly(conn,
+		'''
+		SELECT individuals.id
+		FROM individuals
+		WHERE individuals.death NOT NULL AND individuals.death < DATE('now')
+		''',
+
+		"LIST: US29: List Deceased: Individual {} is no longer alive."
+	)
+
+	#US30 - List living Married **note: widows and widowers will still appear in this list.
+	checkAnomoly(conn,
+		'''
+		SELECT husband.id
+		FROM
+			individuals as husband INNER JOIN families
+			ON (husband.id=families.husbID)
+			INNER JOIN individuals as wife
+			ON (wife.id=families.wifeID)
+		WHERE families.divorced IS NULL AND husband.death IS NULL AND wife.death IS NULL
+		UNION
+		SELECT wife.id
+		FROM
+			individuals as wife INNER JOIN families
+			ON (wife.id=families.wifeID)
+			INNER JOIN individuals as husband
+			ON (husband.id=families.husbID)
+		WHERE families.divorced IS NULL AND husband.death IS NULL AND wife.death IS NULL
+
+		''',
+
+		"LIST: US30: List Living Married: Individual {} is married and alive."
+	)

@@ -194,7 +194,7 @@ def parseText(database, gedText):
 
 			# Keep track of the tag before this one for birth and death dates
 			lastTag = newTag
-	
+
 	valid = db.validateDatabase(database)
 
 	return (noErrors and valid)
@@ -205,7 +205,7 @@ def parseFile(database, filePath):
 		return parseText(database, file.read())
 
 def printDatabase(database):
-	
+
 	# Table for individuals
 	INDI_tbl = PrettyTable(field_names = [
 		"ID",
@@ -253,11 +253,13 @@ def printDatabase(database):
 	#prints table of families
 	print(FAM_tbl)
 
+	db.generateList(database)
+
 if len(sys.argv) > 1:
 
 	database = db.dbInit("GEDCOM.db")
 
 	for filepath in sys.argv[1:]:
 		parseFile(database, filepath)
-	
+
 	printDatabase(database)
