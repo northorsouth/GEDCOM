@@ -402,7 +402,7 @@ def generateList(conn):
 		"LIST: US30: List Living Married: Individual {} is married and alive."
 	)
 
-	#US32 - List living Married
+	#US32 - List living Married (not working)
 	checkAnomoly(conn,
 		'''
 		SELECT child1.id, child1.birth
@@ -415,7 +415,7 @@ def generateList(conn):
 			INNER JOIN children as child2Link ON
 			child2.id == child2Link.childID
 		WHERE
-			child1Link.famID == child2Link.famID AND child1.birth == child2.birth
+			child1Link.famID == child2Link.famID AND child1.birth == child2.birth AND child1.firstName > child2.firstName
 		''',
 
 		"LIST: US32: List Multiple Births: Individual {} was part of a multiple birth on {}."

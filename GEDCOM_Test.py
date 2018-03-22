@@ -287,6 +287,12 @@ class familyTest(unittest.TestCase):
         self.assertTrue(parser.parseText(self.database, goodGirl))
 
         self.assertFalse(parser.parseText(self.database, fam2))
+    
+    # Shows output for multiple births
+    # This doesnt actually test anything, it just shows output
+    def test_multipleBirths(self):
+        self.assertTrue(parser.parseFile(self.database, "input/US32test.ged"))
+        parser.printDatabase(self.database)
 
 #tests miscellaneous user stories
 class miscTest(unittest.TestCase):
