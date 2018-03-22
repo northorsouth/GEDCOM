@@ -367,7 +367,7 @@ def validateDatabase(conn):
 
 def generateList(conn):
 
-	#US29 - Unique IDs
+	#US29 - List Deceased
 	checkAnomoly(conn,
 		'''
 		SELECT individuals.id
