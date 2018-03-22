@@ -405,7 +405,7 @@ def generateList(conn):
 	#US32 - List living Married (not working)
 	checkAnomoly(conn,
 		'''
-		SELECT child1.id, child1.birth
+		SELECT DISTINCT child1.id, child1Link.famID, child1.birth
 		FROM
 			individuals as child1
 			INNER JOIN individuals as child2
@@ -414,9 +414,9 @@ def generateList(conn):
 			child1.id == child1Link.childID
 			INNER JOIN children as child2Link ON
 			child2.id == child2Link.childID
-		WHERE
-			child1Link.famID == child2Link.famID AND child1.birth == child2.birth AND child1.firstName > child2.firstName
+		WHERE child1Link.famID == child2Link.famID AND child1.birth == child2.birth
+		ORDER BY child1.birth, child1Link.famID
 		''',
 
-		"LIST: US32: List Multiple Births: Individual {} was part of a multiple birth on {}."
+		"LIST: US32: List Multiple Births: Individual {} was part of a multiple birth in family {} on {}."
 	)
