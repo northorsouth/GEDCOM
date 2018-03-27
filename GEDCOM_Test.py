@@ -214,6 +214,18 @@ class datesTest(unittest.TestCase):
     #validates that a marriage is before a death (US05)
     def test_marrBFORdeath(self):
         self.assertFalse(parser.parseFile(self.database, "input/US05test.ged"))
+    
+    #asserts that printDeceased prints all dead people
+    def test_deceased(self):
+        self.assertTrue(parser.parseFile(self.database, "input/project03test.ged"))
+
+        dead = db.printDeceased(self.database)
+
+        self.assertEqual(len(dead), 4)
+        self.assertIn(("I01",), dead)
+        self.assertIn(("I02",), dead)
+        self.assertIn(("I06",), dead)
+        self.assertIn(("I08",), dead)
 
 #tests all user stories dealing with family relationships
 class familyTest(unittest.TestCase):
@@ -288,11 +300,26 @@ class familyTest(unittest.TestCase):
 
         self.assertFalse(parser.parseText(self.database, fam2))
     
-    # Shows output for multiple births
-    # This doesnt actually test anything, it just shows output
+    # Asserts that printMultipleBirths prints the triplets in the test file
     def test_multipleBirths(self):
         self.assertTrue(parser.parseFile(self.database, "input/US32test.ged"))
-        parser.printDatabase(self.database)
+        
+        multBirths = db.printMultipleBirths(self.database)
+
+        self.assertEqual(len(multBirths), 3)
+        self.assertIn(("I03", "F01", "1962-08-29"), multBirths)
+        self.assertIn(("I04", "F01", "1962-08-29"), multBirths)
+        self.assertIn(("I05", "F01", "1962-08-29"), multBirths)
+    
+    #asserts that printLivingMarried prints all the living married people
+    def test_livingMarried(self):
+        self.assertTrue(parser.parseFile(self.database, "input/project03test.ged"))
+
+        livingMarried = db.printLivingMarried(self.database)
+
+        self.assertEqual(len(livingMarried), 2)
+        self.assertIn(("I05",), livingMarried)
+        self.assertIn(("I11", ), livingMarried)
 
 #tests miscellaneous user stories
 class miscTest(unittest.TestCase):

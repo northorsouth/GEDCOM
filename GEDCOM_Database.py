@@ -205,19 +205,19 @@ def getChildren(conn, famID):
 		(famID,)
 	).fetchall()
 
-# Apply a given SQL query to the database that should return a list of anomolies
-# Print out the given error message for each row returned
-# The error message should be a valid format string with flags for each column of the SQL query
-# returns true if there are no anomolies, or false if there are
-def checkAnomoly (conn, sql, msg):
+# Apply a given SQL query to the database that should return a list of results
+# Print out the given string for each row returned
+# The string should be a valid format string with flags for each column of the SQL query
+# returns the raw rows
+def printQuery (conn, sql, msg):
 
-	anomolies = conn.cursor().execute(sql).fetchall()
+	rows = conn.cursor().execute(sql).fetchall()
 	formatter = string.Formatter()
 
-	for a in anomolies:
-		print(formatter.vformat(msg, a, None))
+	for row in rows:
+		print(formatter.vformat(msg, row, None))
 
-	return len(anomolies) == 0
+	return rows
 
 def validateDatabase(conn):
 
@@ -225,7 +225,7 @@ def validateDatabase(conn):
 
 	#US01 - dates before current date
 	# future births
-	noerrors &= checkAnomoly(conn,
+	noerrors &= len(printQuery(conn,
 		'''
 		SELECT individuals.id
 		FROM individuals
@@ -233,10 +233,10 @@ def validateDatabase(conn):
 		''',
 
 		"ANOMALY: US01: Dates Before Current Date: Individual {} was born after today."
-	)
+	)) == 0
 
 	# future deaths
-	noerrors &= checkAnomoly(conn,
+	noerrors &= len(printQuery(conn,
 		'''
 		SELECT individuals.id
 		FROM individuals
@@ -244,10 +244,10 @@ def validateDatabase(conn):
 		''',
 
 		"ANOMALY: US01: Dates Before Current Date: Individual {} died after today."
-	)
+	)) == 0
 
 	# future marriages
-	noerrors &= checkAnomoly(conn,
+	noerrors &= len(printQuery(conn,
 		'''
 		SELECT families.id
 		FROM families
@@ -255,10 +255,10 @@ def validateDatabase(conn):
 		''',
 
 		"ANOMALY: US01 Dates Before Current Date: Family {} was married after today."
-	)
+	)) == 0
 
 	#future divorces
-	noerrors &= checkAnomoly(conn,
+	noerrors &= len(printQuery(conn,
 		'''
 		SELECT families.id
 		FROM families
@@ -266,10 +266,10 @@ def validateDatabase(conn):
 		''',
 
 		"ANOMALY: US01: Dates Before Current Date: Family {} was divorced after today."
-	)
+	)) == 0
 
 	#US02 - birth before marriage
-	noerrors &= checkAnomoly(conn,
+	noerrors &= len(printQuery(conn,
 		'''
 		SELECT individuals.id
 		FROM
@@ -279,10 +279,10 @@ def validateDatabase(conn):
 		''',
 
 		"ANOMALY: US02: Birth Before Marriage: Individual {} was born on or before his/her wedding day."
-	)
+	)) == 0
 
 	#US03 - death before birth
-	noerrors &= checkAnomoly(conn,
+	noerrors &= len(printQuery(conn,
 		'''
 		SELECT individuals.id
 		FROM individuals
@@ -290,10 +290,10 @@ def validateDatabase(conn):
 		''',
 
 		"ANOMALY: US03: Death before Birth: Individual {} is born after their death."
-	)
+	)) == 0
 
 	#US04 - marriage before divorce
-	noerrors &= checkAnomoly(conn,
+	noerrors &= len(printQuery(conn,
 		'''
 		SELECT families.id
 		FROM families
@@ -301,10 +301,10 @@ def validateDatabase(conn):
 		''',
 
 		"ANOMALY: US04: Marriage Before Divorce: Family {} was divorced before their marriage"
-	)
+	)) == 0
 
 	#US05 - marriage before death
-	noerrors &= checkAnomoly(conn,
+	noerrors &= len(printQuery(conn,
 		'''
 		SELECT individuals.id
 		FROM
@@ -314,10 +314,10 @@ def validateDatabase(conn):
 		''',
 
 		"ANOMALY: US05: Marriage Before Death: Individual {} was married after their death"
-	)
+	)) == 0
 
 	#US16 - male last names
-	noerrors &= checkAnomoly(conn,
+	noerrors &= len(printQuery(conn,
 		'''
 		SELECT i1.id
 		FROM
@@ -331,10 +331,10 @@ def validateDatabase(conn):
 		''',
 
 		"ANOMALY: US16: Male Last Names: Individual {} does not have the same last name as their father."
-	)
+	)) == 0
 
 	#US18 - siblings should not marry
-	noerrors &= checkAnomoly(conn,
+	noerrors &= len(printQuery(conn,
 		'''
 		SELECT f.id
 		FROM
@@ -347,10 +347,10 @@ def validateDatabase(conn):
 		''',
 
 		"ANOMALY: US18: Siblings should not marry: The spouses in family {} are siblings."
-	)
+	)) == 0
 
 	#US21 - correct gender for roll
-	noerrors &= checkAnomoly(conn,
+	noerrors &= len(printQuery(conn,
 		'''
 		SELECT individuals.id
 		FROM
@@ -361,14 +361,13 @@ def validateDatabase(conn):
 		''',
 
 		"ANOMALY: US21: Correct Gender For Role: Individual {} has the wrong gender for their family role."
-	)
+	)) == 0
 
 	return noerrors
 
-def generateList(conn):
-
-	#US29 - List Deceased
-	checkAnomoly(conn,
+#US29 - List Deceased
+def printDeceased(conn):
+	return printQuery(conn,
 		'''
 		SELECT individuals.id
 		FROM individuals
@@ -377,9 +376,10 @@ def generateList(conn):
 
 		"LIST: US29: List Deceased: Individual {} is no longer alive."
 	)
-
-	#US30 - List living Married
-	checkAnomoly(conn,
+	
+#US30 - List living Married
+def printLivingMarried(conn):
+	return printQuery(conn,
 		'''
 		SELECT husband.id
 		FROM
@@ -402,8 +402,9 @@ def generateList(conn):
 		"LIST: US30: List Living Married: Individual {} is married and alive."
 	)
 
-	#US32 - List living Married (not working)
-	checkAnomoly(conn,
+#US32 - Multiple Births
+def printMultipleBirths(conn):
+	return printQuery(conn,
 		'''
 		SELECT DISTINCT child1.id, child1Link.famID, child1.birth
 		FROM
@@ -420,3 +421,4 @@ def generateList(conn):
 
 		"LIST: US32: List Multiple Births: Individual {} was part of a multiple birth in family {} on {}."
 	)
+	

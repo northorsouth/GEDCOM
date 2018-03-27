@@ -253,7 +253,10 @@ def printDatabase(database):
 	#prints table of families
 	print(FAM_tbl)
 
-	db.generateList(database)
+	# print necessary lists
+	db.printDeceased(database)
+	db.printLivingMarried(database)
+	db.printMultipleBirths(database)
 
 if len(sys.argv) > 1:
 
