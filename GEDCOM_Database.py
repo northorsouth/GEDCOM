@@ -73,8 +73,9 @@ def addIndividual (conn, idStr, firstName, lastName, gender, birth, death):
 	if birth is None:
 		print("ERROR: INDIVIDUAL: Can't add individual " + idStr + ", no birthday")
 		return False
+	#US22 - Unique IDs
 	if not (getIndividual(conn, idStr) is None):
-		print("ERROR: INDIVIDUAL: Can't add individual " + idStr + ", duplicate of existing individual ID")
+		print("ERROR: US22: INDIVIDUAL: Can't add individual " + idStr + ", duplicate of existing individual ID")
 		return False
 	try:
 		conn.cursor().execute(
@@ -116,8 +117,9 @@ def addFamily (conn, idStr, married, divorced, husbID, wifeID):
 	if (getIndividual(conn, husbID) is None):
 		print("ERROR: FAMILY: Can't add Family " + idStr + ", husband does not exist")
 		return False
+	#US22 - Unique IDs
 	if not (getFamily(conn, idStr) is None):
-		print("ERROR: FAMILY: Can't add family " + idStr + ", duplicate of existing family ID")
+		print("ERROR: US22: FAMILY: Can't add family " + idStr + ", duplicate of existing family ID")
 		return False
 	try:
 		conn.cursor().execute(
@@ -376,7 +378,7 @@ def printDeceased(conn):
 
 		"LIST: US29: List Deceased: Individual {} is no longer alive."
 	)
-	
+
 #US30 - List living Married
 def printLivingMarried(conn):
 	return printQuery(conn,
@@ -421,4 +423,3 @@ def printMultipleBirths(conn):
 
 		"LIST: US32: List Multiple Births: Individual {} was part of a multiple birth in family {} on {}."
 	)
-	
