@@ -321,6 +321,7 @@ class familyTest(unittest.TestCase):
         self.assertIn(("I05",), livingMarried)
         self.assertIn(("I11", ), livingMarried)
     
+    # asserts that siblings in the output table are sorted by birthday
     def test_sortedSiblings(self):
         self.assertTrue(parser.parseFile(self.database, "input/US28test.ged"))
 
@@ -338,6 +339,10 @@ class familyTest(unittest.TestCase):
                 self.assertGreaterEqual(
                     db.getIndividual(self.database, children[i][0])[4],
                     db.getIndividual(self.database, children[i-1][0])[4])
+    
+    def test_orphans(self):
+        self.assertTrue(parser.parseFile(self.database, "input/US33test.ged"))
+        parser.printDatabase(self.database)
 
 #tests miscellaneous user stories
 class miscTest(unittest.TestCase):
@@ -353,7 +358,7 @@ class miscTest(unittest.TestCase):
     def test_roleswap(self):
         self.assertFalse(parser.parseFile(self.database, "input/US21test.ged"))
     
-    # Sunny day test, 
+    # Sunny day test, nothing should go wrong here
     def test_sunnyday(self):
         self.assertTrue(parser.parseFile(self.database, "input/project03test.ged"))
 
