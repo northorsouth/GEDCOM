@@ -169,7 +169,7 @@ def addChild (conn, childID, famID):
 # Get a list of all invdividuals as tuples
 def getIndividuals(conn):
 
-	return conn.cursor().execute('SELECT * FROM INDIVIDUALS ORDER BY id').fetchall()
+	return conn.cursor().execute('SELECT * FROM INDIVIDUALS ORDER BY birth').fetchall()
 
 
 
@@ -202,8 +202,14 @@ def getFamily(conn, famID):
 # Get all children in a given family as an array of IDs
 def getChildren(conn, famID):
 
-	return conn.cursor().execute(
-		'SELECT childID FROM CHILDREN WHERE famID=?',
+	return conn.cursor().execute('''
+		SELECT children.childID
+		FROM children
+		INNER JOIN individuals
+		ON individuals.id == children.childID
+		WHERE famID=?
+		ORDER BY individuals.birth
+	''',
 		(famID,)
 	).fetchall()
 
@@ -440,19 +446,19 @@ def printMultipleBirths(conn):
 	)
 
 #US33 - List Orphans
-def orphans(conn):
+def printOrphans(conn):
 	return printQuery(conn,
 '''
-SELECT individuals.id
+SELECT child.id
 FROM
- 	indivuals as child
+ 	individuals as child
 	INNER JOIN children
 	ON child.id == children.childID
 	INNER JOIN FAMILIES
 	ON families.id == children.famID
-	INNER JOIN indivuduals as father
-	ON familes.husbID == father.id
-	INNER JOIN indivudials as mother
+	INNER JOIN individuals as father
+	ON families.husbID == father.id
+	INNER JOIN individuals as mother
 	ON families.wifeID == mother.id
 	WHERE julianday('now') - julianday(child.birth) < 18*365.25 AND
 	mother.death IS NOT NULL and father.death IS NOT NULL

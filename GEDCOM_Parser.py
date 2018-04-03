@@ -257,6 +257,7 @@ def printDatabase(database):
 	db.printDeceased(database)
 	db.printLivingMarried(database)
 	db.printMultipleBirths(database)
+	db.printOrphans(database)
 
 if len(sys.argv) > 1:
 
