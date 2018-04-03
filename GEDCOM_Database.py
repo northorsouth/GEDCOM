@@ -169,7 +169,9 @@ def addChild (conn, childID, famID):
 # Get a list of all invdividuals as tuples
 def getIndividuals(conn):
 
-	return conn.cursor().execute('SELECT * FROM INDIVIDUALS ORDER BY id').fetchall()
+	return conn.cursor().execute(
+		'''SELECT * FROM INDIVIDUALS ORDER BY birth'''
+	).fetchall()
 
 
 
@@ -202,9 +204,11 @@ def getFamily(conn, famID):
 # Get all children in a given family as an array of IDs
 def getChildren(conn, famID):
 
-	return conn.cursor().execute(
-		'SELECT childID FROM CHILDREN WHERE famID=?',
-		(famID,)
+	return conn.cursor().execute('''
+		SELECT children.childID
+		FROM children
+		WHERE famID=?
+	''', (famID,)
 	).fetchall()
 
 # Apply a given SQL query to the database that should return a list of results
