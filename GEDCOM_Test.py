@@ -325,8 +325,6 @@ class familyTest(unittest.TestCase):
     def test_sortedSiblings(self):
         self.assertTrue(parser.parseFile(self.database, "input/US28test.ged"))
 
-        parser.printDatabase(self.database)
-
         indies = db.getIndividuals(self.database)
 
         for i in range(1, len(indies)-1):
@@ -340,9 +338,20 @@ class familyTest(unittest.TestCase):
                     db.getIndividual(self.database, children[i][0])[4],
                     db.getIndividual(self.database, children[i-1][0])[4])
     
+    # Asserts that printOrphans finds all the orphans it should
     def test_orphans(self):
+
+        # make sure the test file is read in without errors
         self.assertTrue(parser.parseFile(self.database, "input/US33test.ged"))
-        parser.printDatabase(self.database)
+
+        # get the list of orphans in the database
+        orphans = db.printOrphans(self.database)
+
+        # make sure the orphans list only has one item
+        self.assertEqual(len(orphans), 1)
+
+        # make sure Robert Johnson is in the orphans list
+        self.assertIn(("I03",), orphans)
 
 #tests miscellaneous user stories
 class miscTest(unittest.TestCase):
