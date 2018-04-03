@@ -340,17 +340,11 @@ class familyTest(unittest.TestCase):
     
     # Asserts that printOrphans finds all the orphans it should
     def test_orphans(self):
-
-        # make sure the test file is read in without errors
         self.assertTrue(parser.parseFile(self.database, "input/US33test.ged"))
-
-        # get the list of orphans in the database
+        
         orphans = db.printOrphans(self.database)
 
-        # make sure the orphans list only has one item
         self.assertEqual(len(orphans), 1)
-
-        # make sure Robert Johnson is in the orphans list
         self.assertIn(("I03",), orphans)
 
 #tests miscellaneous user stories
