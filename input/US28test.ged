@@ -17,20 +17,6 @@
 2 DATE 3 MAY 2001
 1 FAMS F01
 0 NOTE end of Sally Smith
-0 I99 INDI
-1 NAME Robert /Johnson/
-1 SEX M
-1 BIRT
-2 DATE 29 AUG 1962
-1 FAMC F01
-0 NOTE end Robert Johnson
-0 I165 INDI
-1 NAME Benjamin /Johnson/
-1 SEX M
-1 BIRT
-2 DATE 12 OCT 1967
-1 FAMC F01
-0 NOTE end Benjamin Johnson/
 0 I62 INDI
 1 NAME Rebecca /Johnson/
 1 SEX F
@@ -40,6 +26,20 @@
 1 FAMS F03
 1 FAMS F04
 0 NOTE end Rebecca Johnson
+0 I165 INDI
+1 NAME Benjamin /Johnson/
+1 SEX M
+1 BIRT
+2 DATE 12 OCT 1967
+1 FAMC F01
+0 NOTE end Benjamin Johnson/
+0 I99 INDI
+1 NAME Robert /Johnson/
+1 SEX M
+1 BIRT
+2 DATE 29 AUG 1962
+1 FAMC F01
+0 NOTE end Robert Johnson
 0 F01 FAM
 1 MARR
 2 DATE 22 AUG 1955
@@ -65,6 +65,13 @@
 2 DATE 3 JAN 1944
 1 FAMS F02
 0 NOTE end Rachel Shields
+0 I106 INDI
+1 NAME Fred /Broome/
+1 SEX M
+1 BIRT
+2 DATE 7 APR 1971
+1 FAMC F02
+0 NOTE end Fred Broome
 0 I54 INDI
 1 NAME Allan /Broome/
 1 SEX M
@@ -75,13 +82,6 @@
 1 FAMC F02
 1 FAMS F03
 0 NOTE end Allan Broome
-0 I106 INDI
-1 NAME Fred /Broome/
-1 SEX M
-1 BIRT
-2 DATE 7 APR 1971
-1 FAMC F02
-0 NOTE end Fred Broome
 0 F02 FAM
 1 MARR
 2 DATE 3 AUG 1965
