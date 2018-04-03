@@ -320,6 +320,24 @@ class familyTest(unittest.TestCase):
         self.assertEqual(len(livingMarried), 2)
         self.assertIn(("I05",), livingMarried)
         self.assertIn(("I11", ), livingMarried)
+    
+    def test_sortedSiblings(self):
+        self.assertTrue(parser.parseFile(self.database, "input/US28test.ged"))
+
+        parser.printDatabase(self.database)
+
+        indies = db.getIndividuals(self.database)
+
+        for i in range(1, len(indies)-1):
+            self.assertGreaterEqual(indies[i][4], indies[i-1][4])
+        
+        for fam in db.getFamilies(self.database):
+            children = db.getChildren(self.database, fam[0])
+
+            for i in range(1, len(children)-1):
+                self.assertGreaterEqual(
+                    db.getIndividual(self.database, children[i][0])[4],
+                    db.getIndividual(self.database, children[i-1][0])[4])
 
 #tests miscellaneous user stories
 class miscTest(unittest.TestCase):
@@ -335,6 +353,7 @@ class miscTest(unittest.TestCase):
     def test_roleswap(self):
         self.assertFalse(parser.parseFile(self.database, "input/US21test.ged"))
     
+    # Sunny day test, 
     def test_sunnyday(self):
         self.assertTrue(parser.parseFile(self.database, "input/project03test.ged"))
 
