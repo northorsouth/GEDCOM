@@ -365,7 +365,22 @@ def validateDatabase(conn):
 		"ANOMALY: US21: Correct Gender For Role: Individual {} has the wrong gender for their family role."
 	)) == 0
 
+	#US23 - Unique Name and Births
+	noerrors &= len(printQuery(conn,
+		'''
+		SELECT ind1.id, ind2.id
+		FROM
+			individuals as ind1 INNER JOIN
+			individuals as ind2 ON
+			ind1.id != ind2.id AND
+			ind1.birth == ind2.birth AND ind1.firstname==ind2.firstname AND ind1.lastname==ind2.lastname
+		''',
+
+		"ANOMALY: US23: Unique Name and Birth: Individual {} has the same Name and Birthday as {}."
+	)) == 0
+
 	return noerrors
+
 
 #US29 - List Deceased
 def printDeceased(conn):
