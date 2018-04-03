@@ -345,6 +345,32 @@ class miscTest(unittest.TestCase):
     
     def test_duplicateFamIDs(self):
         self.assertFalse(parser.parseFile(self.database, "input/US22test_2.ged"))
+    
+    def test_samePerson(self):
+
+        guy1 = '''
+            0 @I3@ INDI
+            1 NAME Good /Guy1/
+            1 SEX M
+            1 BIRT
+            2 DATE 25 APR 1919
+            1 DEAT
+            2 DATE 13 SEP 1939
+            0 TRLR
+        '''
+
+        guy2 = '''
+            0 @I4@ INDI
+            1 NAME Good /Guy1/
+            1 SEX F
+            1 BIRT
+            2 DATE 25 APR 1919
+            0 TRLR
+        '''
+
+        self.assertTrue(parser.parseText(self.database, guy1))
+        self.assertFalse(parser.parseText(self.database, guy2))
+
 
 
 unittest.main()
