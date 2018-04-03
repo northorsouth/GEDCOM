@@ -207,7 +207,10 @@ def getChildren(conn, famID):
 	return conn.cursor().execute('''
 		SELECT children.childID
 		FROM children
+		INNER JOIN individuals
+		ON individuals.id == children.childID
 		WHERE famID=?
+		ORDER BY individuals.birth
 	''', (famID,)
 	).fetchall()
 
