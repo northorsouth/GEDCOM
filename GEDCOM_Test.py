@@ -232,7 +232,6 @@ class datesTest(unittest.TestCase):
         self.assertTrue(parser.parseFile(self.database, "input/US34test.ged"))
 
         LargeAgeDifference = db.printLargeAgeDifferences(self.database)
-        print(LargeAgeDifference)
 
         self.assertEqual(len(LargeAgeDifference), 2)
         self.assertIn(("I01", "I02"), LargeAgeDifference) #husband age 2x wife age
