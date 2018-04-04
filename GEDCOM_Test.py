@@ -227,6 +227,17 @@ class datesTest(unittest.TestCase):
         self.assertIn(("I06",), dead)
         self.assertIn(("I08",), dead)
 
+    # US34 - asserts that printLargeAgeDifferences includes the correct individuals
+    def test_largeagedifferences(self):
+        self.assertTrue(parser.parseFile(self.database, "input/US34test.ged"))
+
+        LargeAgeDifference = db.printLargeAgeDifferences(self.database)
+        print(LargeAgeDifference)
+
+        self.assertEqual(len(LargeAgeDifference), 2)
+        self.assertIn(("I01", "I02"), LargeAgeDifference) #husband age 2x wife age
+        self.assertIn(("I04", "I03"), LargeAgeDifference) #wife age 2x husband age
+
 #tests all user stories dealing with family relationships
 class familyTest(unittest.TestCase):
 
