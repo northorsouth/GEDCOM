@@ -448,23 +448,48 @@ def printMultipleBirths(conn):
 #US33 - List Orphans
 def printOrphans(conn):
 	return printQuery(conn,
-'''
-SELECT child.id
-FROM
- 	individuals as child
-	INNER JOIN children
-	ON child.id == children.childID
-	INNER JOIN FAMILIES
-	ON families.id == children.famID
-	INNER JOIN individuals as father
-	ON families.husbID == father.id
-	INNER JOIN individuals as mother
-	ON families.wifeID == mother.id
+	'''
+	SELECT child.id
+	FROM
+		individuals as child
+		INNER JOIN children
+		ON child.id == children.childID
+		INNER JOIN FAMILIES
+		ON families.id == children.famID
+		INNER JOIN individuals as father
+		ON families.husbID == father.id
+		INNER JOIN individuals as mother
+		ON families.wifeID == mother.id
 	WHERE julianday('now') - julianday(child.birth) < 18*365.25 AND
-	mother.death IS NOT NULL and father.death IS NOT NULL
+		mother.death IS NOT NULL and father.death IS NOT NULL
 
 	''',
 
 	"LIST: US33: List Orphans: Individual {} was orphaned."
+)
 
-	)
+def printLargeAgeDifferences(conn):
+	return printQuery(conn,
+	'''
+		SELECT husband.id, wife.id
+
+		FROM families
+		INNER JOIN individuals as husband
+		ON families.husbID == husband.id
+		INNER JOIN individuals as wife
+		ON families.wifeID == wife.id
+
+		WHERE
+			(
+				((julianday(families.married) - julianday(husband.birth)) * 2) <
+				(julianday(families.married) - julianday(wife.birth))
+			)
+			OR
+			(
+				((julianday(families.married) - julianday(wife.birth)) * 2) <
+				(julianday(families.married) - julianday(husband.birth))
+			)
+	''',
+
+	"LIST: US34: List Large Age Differences: Individual {} and {} were married with a large age difference"
+)
