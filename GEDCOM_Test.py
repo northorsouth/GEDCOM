@@ -19,7 +19,7 @@ class datesTest(unittest.TestCase):
     def tearDown(self):
         self.database.close()
 
-    # validates birthdays are before the current date
+    # US01 - validates birthdays are before the current date
     def test_dateBFORcurrent_1(self):
 
         badBday = '''
@@ -33,7 +33,7 @@ class datesTest(unittest.TestCase):
 
         self.assertFalse(parser.parseText(self.database, badBday))
 
-    # validates death dates are before the current date
+    # US01 - validates death dates are before the current date
     def test_dateBFORcurrent_2(self):
 
         badDday = '''
@@ -49,7 +49,7 @@ class datesTest(unittest.TestCase):
 
         self.assertFalse(parser.parseText(self.database, badDday))
 
-    # validates all marriages are before the current date
+    # US01 - validates all marriages are before the current date
     def test_dateBFORcurrent_3(self):
 
         goodGuy = '''
@@ -87,7 +87,7 @@ class datesTest(unittest.TestCase):
 
         self.assertFalse(parser.parseText(self.database, badMar))
 
-    # validates all divorce dates are before the current date
+    # US01 - validates all divorce dates are before the current date
     def test_dateBFORcurrent_4(self):
 
         goodGuy = '''
@@ -127,7 +127,7 @@ class datesTest(unittest.TestCase):
 
         self.assertFalse(parser.parseText(self.database, badDiv))
 
-    # Wife was born after wedding
+    # US02 - Wife was born after wedding
     def test_birtBFORmarr_1(self):
 
         # Wife was born after wedding
@@ -166,7 +166,7 @@ class datesTest(unittest.TestCase):
 
         self.assertFalse(parser.parseText(self.database, fam1))
 
-    # husband was born after wedding
+    # US02 - husband was born after wedding
     def test_birtBFORmarr_2(self):
         guy2 = '''
             0 @I5@ INDI
@@ -203,19 +203,19 @@ class datesTest(unittest.TestCase):
 
         self.assertFalse(parser.parseText(self.database, fam2))
 
-    # validates the individual is born before their death date
+    # US03 - validates the individual is born before their death date
     def test_birtBFORdeat(self):
         self.assertFalse(parser.parseFile(self.database, "input/US03test.ged"))
 
-    # validates that a couple was married before they got divorced
+    # US04 - validates that a couple was married before they got divorced
     def test_marrBFORdiv(self):
         self.assertFalse(parser.parseFile(self.database, "input/US04test.ged"))
 
-    #validates that a marriage is before a death (US05)
+    # US05 - validates that a marriage is before a death
     def test_marrBFORdeath(self):
         self.assertFalse(parser.parseFile(self.database, "input/US05test.ged"))
-    
-    #asserts that printDeceased prints all dead people
+
+    # US29 - asserts that printDeceased prints all dead people
     def test_deceased(self):
         self.assertTrue(parser.parseFile(self.database, "input/project03test.ged"))
 
@@ -237,11 +237,11 @@ class familyTest(unittest.TestCase):
     def tearDown(self):
         self.database.close()
 
-    #validates that no children have a different last name than their father (US16)
+    # US16 - validates that no male children have a different last name than their father (US16)
     def test_maleLastNames(self):
         self.assertFalse(parser.parseFile(self.database, "input/US16test.ged"))
 
-    # validates that no siblings are married
+    # US18 - validates that no siblings are married
     def test_siblingsShouldNotMarry(self):
         self.assertFalse(parser.parseFile(self.database, "input/US18test.ged"))
 
@@ -299,19 +299,19 @@ class familyTest(unittest.TestCase):
         self.assertTrue(parser.parseText(self.database, goodGirl))
 
         self.assertFalse(parser.parseText(self.database, fam2))
-    
-    # Asserts that printMultipleBirths prints the triplets in the test file
+
+    # US32 - Asserts that printMultipleBirths prints the triplets in the test file
     def test_multipleBirths(self):
         self.assertTrue(parser.parseFile(self.database, "input/US32test.ged"))
-        
+
         multBirths = db.printMultipleBirths(self.database)
 
         self.assertEqual(len(multBirths), 3)
         self.assertIn(("I03", "F01", "1962-08-29"), multBirths)
         self.assertIn(("I04", "F01", "1962-08-29"), multBirths)
         self.assertIn(("I05", "F01", "1962-08-29"), multBirths)
-    
-    #asserts that printLivingMarried prints all the living married people
+
+    # US30 - asserts that printLivingMarried prints all the living married people
     def test_livingMarried(self):
         self.assertTrue(parser.parseFile(self.database, "input/project03test.ged"))
 
@@ -320,8 +320,8 @@ class familyTest(unittest.TestCase):
         self.assertEqual(len(livingMarried), 2)
         self.assertIn(("I05",), livingMarried)
         self.assertIn(("I11", ), livingMarried)
-    
-    # asserts that siblings in the output table are sorted by birthday
+
+    # US28 - asserts that siblings in the output table are sorted by birthday
     def test_sortedSiblings(self):
         self.assertTrue(parser.parseFile(self.database, "input/US28test.ged"))
 
@@ -329,7 +329,7 @@ class familyTest(unittest.TestCase):
 
         for i in range(1, len(indies)-1):
             self.assertGreaterEqual(indies[i][4], indies[i-1][4])
-        
+
         for fam in db.getFamilies(self.database):
             children = db.getChildren(self.database, fam[0])
 
@@ -337,11 +337,11 @@ class familyTest(unittest.TestCase):
                 self.assertGreaterEqual(
                     db.getIndividual(self.database, children[i][0])[4],
                     db.getIndividual(self.database, children[i-1][0])[4])
-    
-    # Asserts that printOrphans finds all the orphans it should
+
+    # US33 - Asserts that printOrphans finds all the orphans it should
     def test_orphans(self):
         self.assertTrue(parser.parseFile(self.database, "input/US33test.ged"))
-        
+
         orphans = db.printOrphans(self.database)
 
         self.assertEqual(len(orphans), 1)
@@ -357,22 +357,25 @@ class miscTest(unittest.TestCase):
     def tearDown(self):
         self.database.close()
 
-    # validates that individuals have the correct family role for their Gender
+    # US21 - validates that individuals have the correct family role for their Gender
     def test_roleswap(self):
         self.assertFalse(parser.parseFile(self.database, "input/US21test.ged"))
-    
+
     # Sunny day test, nothing should go wrong here
     def test_sunnyday(self):
         self.assertTrue(parser.parseFile(self.database, "input/project03test.ged"))
 
         parser.printDatabase(self.database)
-    
+
+    # US22 - validates that no two individuals have the same individual ID
     def test_duplicateIndIDs(self):
         self.assertFalse(parser.parseFile(self.database, "input/US22test_1.ged"))
-    
+
+    # US22 - validates that no two families have the same family ID
     def test_duplicateFamIDs(self):
         self.assertFalse(parser.parseFile(self.database, "input/US22test_2.ged"))
-    
+
+    # US23 - validates that no two individuals have the same name and birthday
     def test_samePerson(self):
 
         guy1 = '''
