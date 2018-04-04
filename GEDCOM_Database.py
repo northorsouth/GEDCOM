@@ -482,12 +482,22 @@ def printLargeAgeDifferences(conn):
 
 		WHERE
 			(
-				((julianday(families.married) - julianday(husband.birth)) * 2) <
+				((julianday(families.married) - julianday(husband.birth)) * 2) <=
 				(julianday(families.married) - julianday(wife.birth))
 			)
 			OR
 			(
-				((julianday(families.married) - julianday(wife.birth)) * 2) <
+				((julianday(families.married) - julianday(wife.birth)) * 2) <=
+				(julianday(families.married) - julianday(husband.birth))
+			)
+			AND
+			(
+				((julianday(families.married) - julianday(husband.birth)) * .5) >=
+				(julianday(families.married) - julianday(wife.birth))
+			)
+			OR
+			(
+				((julianday(families.married) - julianday(wife.birth)) * .5) >=
 				(julianday(families.married) - julianday(husband.birth))
 			)
 	''',
