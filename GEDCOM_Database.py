@@ -466,7 +466,7 @@ def printOrphans(conn):
 	''',
 
 	"LIST: US33: List Orphans: Individual {} was orphaned."
-)
+	)
 
 #US34 - print large age differences
 def printLargeAgeDifferences(conn):
@@ -482,25 +482,15 @@ def printLargeAgeDifferences(conn):
 
 		WHERE
 			(
-				((julianday(families.married) - julianday(husband.birth)) * 2) <=
+				((julianday(families.married) - julianday(husband.birth)) * 2) >=
 				(julianday(families.married) - julianday(wife.birth))
 			)
 			OR
 			(
-				((julianday(families.married) - julianday(wife.birth)) * 2) <=
-				(julianday(families.married) - julianday(husband.birth))
-			)
-			AND
-			(
-				((julianday(families.married) - julianday(husband.birth)) * .5) >=
-				(julianday(families.married) - julianday(wife.birth))
-			)
-			OR
-			(
-				((julianday(families.married) - julianday(wife.birth)) * .5) >=
+				((julianday(families.married) - julianday(wife.birth)) * 2) >=
 				(julianday(families.married) - julianday(husband.birth))
 			)
 	''',
 
 	"LIST: US34: List Large Age Differences: Individual {} and {} were married with a large age difference"
-)
+	)
