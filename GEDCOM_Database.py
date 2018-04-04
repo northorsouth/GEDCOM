@@ -468,6 +468,7 @@ def printOrphans(conn):
 	"LIST: US33: List Orphans: Individual {} was orphaned."
 )
 
+#US34 - print large age differences
 def printLargeAgeDifferences(conn):
 	return printQuery(conn,
 	'''
